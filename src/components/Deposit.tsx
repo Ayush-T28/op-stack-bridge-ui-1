@@ -183,7 +183,7 @@ export default function Deposit({chains} : DepositProps){
             <Typography variant='caption'>Time to transfer: ~1 minute</Typography>
             {txHash && !error ? (
                 <Stack gap={1} marginTop={2}>
-                <LinearProgress />
+                {runningTx && <LinearProgress variant='indeterminate' /> }
                 <Button
                     className="cursor-pointer underline"
                     href={`${chains[0].blockExplorers?.default.url}/tx/${txHash}`}
@@ -194,7 +194,7 @@ export default function Deposit({chains} : DepositProps){
                 </Button>
                 </Stack>
             ) : <Button color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeDeposit}>{ runningTx ? 'Sending Deposit' : 'Confirm Deposit' }</Button>}
-            {error && <Typography color='red' variant="caption">There was an error : {error}</Typography>}
+            {error && <Typography color='red' variant="caption" noWrap>There was an error : {error}</Typography>}
             </Box>
         </Modal>
         <Stack gap={2} alignItems='center'> 
