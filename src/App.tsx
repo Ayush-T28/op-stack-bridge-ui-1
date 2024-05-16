@@ -24,7 +24,7 @@ function App() {
         symbol: "BUI",
         decimals: 18,
         address: "0x90fa379e947fDe331f3465d19845A8eB5031AC0B",
-    })
+    });
 
     const config = getDefaultConfig({
         appName: 'Optimism Bridge',
