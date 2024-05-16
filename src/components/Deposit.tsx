@@ -1,0 +1,189 @@
+import ArrowDownward from "@mui/icons-material/ArrowDownward";
+import { Box, Button, Divider, Grid, IconButton, InputBase, Modal, Paper, Stack, Typography } from "@mui/material";
+import { Chain } from "@rainbow-me/rainbowkit";
+import Balance from "./Balance";
+import { useERC20Allowance } from "../hooks/useERC20Allowance";
+import { useAccount, usePublicClient } from "wagmi";
+import { Address, ChainContract } from "viem";
+import { useEffect, useState } from "react";
+import { switchChain } from "viem/actions";
+import { optimismPortalProxyABI } from "../constants/contracts";
+import Web3 from 'web3'
+
+type DepositProps = {
+    chains: Chain[],
+}
+
+export default function Deposit({chains} : DepositProps){
+    const {address, chain} = useAccount();
+    const [amount, setAmount] = useState(0.0);
+    const web3 = new Web3(window.ethereum)
+
+    const [gasLimit, setGasLimit] = useState(0);
+    const [gas, setGas] = useState(0);
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    const { allowance, approve } = useERC20Allowance({
+        token: '0x90fa379e947fDe331f3465d19845A8eB5031AC0B',
+        chainId: chains[0].id,
+        amount: BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
+        owner: address as Address,
+        spender: (chains[0].contracts!.optimismPortalProxy! as ChainContract).address,
+    });
+    const l1PublicClient = usePublicClient({ chainId: chains[0].id })
+
+
+    async function approveSpending() {
+        if(chain !== chains[0]){
+            await switchChain(window.ethereum!, {id: chains[0].id});
+        }
+        const shouldApprove = allowance.data! < amount;
+        if (shouldApprove) {
+            const approvalTxHash = await approve()
+            await l1PublicClient!.waitForTransactionReceipt({ hash: approvalTxHash })
+        }
+    }
+
+    async function estimateGas() {
+        const contract = new web3.eth.Contract(optimismPortalProxyABI, (chains[0].contracts!.optimismPortalProxy as ChainContract).address)
+    
+        const functionArgs = {
+            from: address,
+        }
+    
+        const gasLimit = await contract.methods.depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x',)
+            .estimateGas(functionArgs)
+            .catch((error) => {
+                console.log(error)
+        })
+
+           
+        if (!gasLimit) {
+            setGas(-1);
+            return;
+        }
+
+
+        const gasPrice = await web3.eth.getGasPrice();
+        const gasCostWei = gasLimit * gasPrice;
+ 
+        setGasLimit(parseFloat(gasLimit.toString()));
+        setGas(parseFloat(gasCostWei.toString()));
+    }
+
+    async function callDeposit() {
+        const contract = new web3.eth.Contract(optimismPortalProxyABI, (chains[0].contracts!.optimismPortalProxy as ChainContract).address)
+
+        const functionArgs = {
+            from: address,
+            gas: gasLimit.toString(), // Set your desired gas limit here
+          }
+          // Call the specific function on the contract
+          await contract.methods.depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x',)
+            .send(functionArgs)
+            .then((res) => {
+              console.log(res.transactionHash as string);
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+
+    }
+
+
+    async function showReviewModal() {
+        estimateGas();
+        handleOpen();
+    }
+
+    async function executeDeposit() {
+        await approveSpending();
+        await callDeposit();
+    }
+
+    useEffect(()=>{
+        approveSpending();
+    }, []);
+      
+    return (
+        <>
+        <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        >
+        <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+        }}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+            Review Deposit
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Please make sure the following details are correct before proceeding
+            </Typography>
+            <Divider sx={{marginTop: 3}}/>
+            <Stack gap={1} paddingY={3}>
+            <Typography variant='body2'>
+                You are sending: {Web3.utils.fromWei(amount, 'ether')} ETH
+            </Typography>
+            <Typography variant='body2'>
+                Estimated Gas: {Web3.utils.fromWei(gas, 'ether')} ETH
+            </Typography>
+            </Stack>
+            <Button   color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeDeposit}>Confirm Deposit</Button>
+        </Box>
+        </Modal>
+        <Stack gap={2} alignItems='center'> 
+            <Grid container width='100%' alignItems='center' gap={2}> 
+                <Typography variant='h5' color='InactiveCaptionText'>From </Typography>
+                <img src={chains[0].iconUrl?.toString()} height={35} alt='Ethereum logo'/> 
+                <Typography variant="h5">{chains[0].name}</Typography>
+
+                <Balance rpc={chains[0].rpcUrls.default.http[0]} level="l1" />
+            </Grid>
+
+            <Paper
+            component="form"
+            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '100%' }}
+            >
+                <InputBase
+                    sx={{ ml: 1, flex: 1 }}
+                    placeholder="Amount"
+                    onChange={(e)=>{setAmount(parseFloat(Web3.utils.toWei(parseFloat(e.target.value), 'ether')))}}
+                    inputProps={{ 'aria-label': 'search google maps' }}
+                    defaultValue={0.00}
+                    autoFocus
+                />
+                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                <IconButton color="primary" sx={{ padding: '10px' }} aria-label="directions">
+                    <img src="/ethereum.png" height={35} />
+                    <Typography marginLeft={1}>ETH</Typography>
+                </IconButton>
+            </Paper>
+
+            <ArrowDownward fontSize='large' color='secondary' />
+
+            <Grid container width='100%' alignItems='center' gap={2}> 
+                <Typography variant='h5' color='InactiveCaptionText'>To </Typography>
+                <img src={chains[1].iconUrl?.toString()} height={35} alt='Ethereum logo'/> 
+                <Typography variant="h5">{chains[1].name}</Typography>
+
+                <Balance rpc={chains[1].rpcUrls.default.http[0]} level="l2" />
+            </Grid>
+
+            <Button color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Deposit</Button>
+        </Stack>
+        </>
+    )
+}
