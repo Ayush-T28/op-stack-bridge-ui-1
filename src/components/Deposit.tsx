@@ -1,5 +1,5 @@
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import { Box, Button, Divider, Grid, IconButton, InputBase, Modal, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid, IconButton, InputBase, LoadingButton, Modal, Paper, Stack, Typography } from "@mui/material";
 import { Chain } from "@rainbow-me/rainbowkit";
 import Balance from "./Balance";
 import { useERC20Allowance } from "../hooks/useERC20Allowance";
@@ -18,6 +18,9 @@ export default function Deposit({chains} : DepositProps){
     const {address, chain} = useAccount();
     const [amount, setAmount] = useState(0.0);
     const web3 = new Web3(window.ethereum)
+
+    const [runningTx, setRunningTx] = useState(false);
+    const [txHash, setTxHash] = useState('');
 
     const [gasLimit, setGasLimit] = useState(0);
     const [gas, setGas] = useState(0);
@@ -74,6 +77,7 @@ export default function Deposit({chains} : DepositProps){
     }
 
     async function callDeposit() {
+        setRunningTx(true);
         const contract = new web3.eth.Contract(optimismPortalProxyABI, (chains[0].contracts!.optimismPortalProxy as ChainContract).address)
 
         const functionArgs = {
@@ -84,10 +88,12 @@ export default function Deposit({chains} : DepositProps){
           await contract.methods.depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x',)
             .send(functionArgs)
             .then((res) => {
-              console.log(res.transactionHash as string);
+              setTxHash(res.transactionHash);
+              setRunningTx(false);
             })
             .catch((error) => {
               console.log(error)
+              setRunningTx(false);
             })
 
     }
@@ -106,6 +112,14 @@ export default function Deposit({chains} : DepositProps){
     useEffect(()=>{
         approveSpending();
     }, []);
+
+
+    useEffect(()=>{
+        // reset tx hash when modal is closed
+        if(!open){
+            setTxHash('');
+        }
+    }, [open])
       
     return (
         <>
@@ -141,8 +155,20 @@ export default function Deposit({chains} : DepositProps){
                 Estimated Gas: {Web3.utils.fromWei(gas, 'ether')} ETH
             </Typography>
             </Stack>
-            <Button   color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeDeposit}>Confirm Deposit</Button>
-        </Box>
+            <Typography variant='caption'>Time to transfer: ~1 minute</Typography>
+            {txHash ? (
+                <Typography variant="body1">
+                <Button
+                    className="cursor-pointer underline"
+                    href={`${chains[0].blockExplorers?.default.url}/tx/${txHash}`}
+                    target='_blank'
+                    variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}}
+                >
+                    View Transaction
+                </Button>
+                </Typography>
+            ) : <Button color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeDeposit}>{ runningTx ? 'Sending Deposit' : 'Confirm Deposit' }</Button>}
+            </Box>
         </Modal>
         <Stack gap={2} alignItems='center'> 
             <Grid container width='100%' alignItems='center' gap={2}> 
