@@ -1,12 +1,33 @@
 import { ArrowDownward, ArrowRight, ArrowUpward } from "@mui/icons-material"
+import { useAccount } from 'wagmi'
+import Web3 from 'web3'
 import { Paper, Tabs, Tab, Box, useColorScheme, Stack, Divider, Typography } from "@mui/material"
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getDeposits } from "../api/deposit";
+import { DepositQuery, WithdrawalQuery } from "../types";
+import { getWithdrawals } from "../api/withdrawal";
   
 
 export default function Activity(){
-    const [value, setValue] = useState("all");
+    const { address } = useAccount();
+    const [value, setValue] = useState("deposits" as "deposits" | "withdrawals");
     const { mode } = useColorScheme();
-
+    const [deposits, setDeposits] = useState([] as DepositQuery[]);
+    const [withdrawals, setWithdrawals] = useState([] as WithdrawalQuery[]);
+    useEffect(() => {
+        console.log(value);
+        if (address) {
+            if (value === 'deposits') {
+                getDeposits(address?.toString() as string).then((data) => {
+                    setDeposits(data);
+                })
+            } else {
+                getWithdrawals(address?.toString() as string).then((data) => {
+                    setWithdrawals(data);
+                })
+            }
+        }
+    }, [address, value]);
     return (
         <Paper
             sx={{
@@ -27,50 +48,38 @@ export default function Activity(){
                 textColor="primary"
                 indicatorColor="primary"
             >
-                <Tab value="all" label="Deposits" iconPosition='start' icon={<ArrowDownward />}/>
-                <Tab value="pending" label="Withdrawls" iconPosition='start' icon={<ArrowUpward />}/>
+                <Tab value="deposits" label="Deposits" iconPosition='start' icon={<ArrowDownward />}/>
+                <Tab value="withdrawals" label="Withdrawls" iconPosition='start' icon={<ArrowUpward />}/>
             </Tabs>
             <Box width='100%' textAlign='center' marginX='auto' py={5} height='90%'>
                 <Stack gap={2} overflow='scroll' maxHeight='100%' p={2} height='100%'>
-                   <Stack direction='row' sx={{ background: 'RGBA(99, 179, 101, 0.1)', backdropFilter: 'blur(3px)' }} borderRadius={2} minHeight={100} maxHeight={100} width='100%' overflow='hidden' border='2px solid' borderColor='RGB(99, 179, 101)'>
+                    {value === 'deposits' ? deposits.map((deposit) => (                   
+                    <Stack key={deposit.id} direction='row' sx={{ background: 'RGBA(99, 179, 101, 0.1)', backdropFilter: 'blur(3px)' }} borderRadius={2} minHeight={100} maxHeight={100} width='100%' overflow='hidden' border='2px solid' borderColor='RGB(99, 179, 101)'>
                         <Stack direction='row' height='100%' width='100%' alignItems='center' gap={1} p={2}>
                             <img src="/ethereum.png" height={50}/>
                             <ArrowRight />
                             <img src="/optimism.png" height={50}/>
                             <Divider orientation='vertical' />
                             <Stack p={2}>
-                                <Typography variant='h5'>20 ETH</Typography>
-                                <Typography variant="caption">May 11 05:47 PM</Typography>
+                                <Typography variant='h5'>{Web3.utils.fromWei(deposit.amount, 'ether')} ETH</Typography>
+                                <Typography variant="caption">{new Date(deposit.created_at).toString()}</Typography>
                             </Stack>
                             <Typography marginLeft='auto' variant='h6' color='green'>Completed</Typography>
                         </Stack>
-                   </Stack>
-                   <Stack direction='row' sx={{ background: 'RGBA(255,120,0, 0.1)', backdropFilter: 'blur(3px)' }} borderRadius={2} minHeight={100} maxHeight={100} width='100%' overflow='hidden' border='2px solid' borderColor='RGB(255,120,0)'>
-                   <Stack direction='row' height='100%' width='100%' alignItems='center' gap={1} p={2}>
+                   </Stack>)) : withdrawals.map((withdrawal) => (                   
+                    <Stack key={withdrawal.id} direction='row' sx={{ background: 'RGBA(99, 179, 101, 0.1)', backdropFilter: 'blur(3px)' }} borderRadius={2} minHeight={100} maxHeight={100} width='100%' overflow='hidden' border='2px solid' borderColor='RGB(99, 179, 101)'>
+                        <Stack direction='row' height='100%' width='100%' alignItems='center' gap={1} p={2}>
                             <img src="/ethereum.png" height={50}/>
                             <ArrowRight />
                             <img src="/optimism.png" height={50}/>
                             <Divider orientation='vertical' />
                             <Stack p={2}>
-                                <Typography variant='h5'>20 ETH</Typography>
-                                <Typography variant="caption">May 11 05:47 PM</Typography>
+                                <Typography variant='h5'>{Web3.utils.fromWei(withdrawal.amount, 'ether')} ETH</Typography>
+                                <Typography variant="caption">{new Date(withdrawal.created_at).toString()}</Typography>
                             </Stack>
-                            <Typography marginLeft='auto' variant='h6' color='yellow'>Pending</Typography>
+                            <Typography marginLeft='auto' variant='h6' color='green'>Completed</Typography>
                         </Stack>
-                    </Stack>
-                   <Stack direction='row' sx={{ background: 'RGBA(255,50,50, 0.1)', backdropFilter: 'blur(3px)' }} borderRadius={2} minHeight={100} maxHeight={100} width='100%' overflow='hidden' border='2px solid' borderColor='RGB(255,50,50)'>
-                   <Stack direction='row' height='100%' width='100%' alignItems='center' gap={1} p={2}>
-                            <img src="/ethereum.png" height={50}/>
-                            <ArrowRight />
-                            <img src="/optimism.png" height={50}/>
-                            <Divider orientation='vertical' />
-                            <Stack p={2}>
-                                <Typography variant='h5'>20 ETH</Typography>
-                                <Typography variant="caption">May 11 05:47 PM</Typography>
-                            </Stack>
-                            <Typography marginLeft='auto' variant='h6' color='red'>Failed</Typography>
-                        </Stack>
-                   </Stack>
+                   </Stack>))}
                 </Stack>
             </Box>
         </Paper>
