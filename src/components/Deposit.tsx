@@ -10,6 +10,7 @@ import { switchChain } from "viem/actions";
 import { optimismPortalProxyABI } from "../constants/contracts";
 import Web3 from 'web3'
 import { ContentCopy } from "@mui/icons-material";
+import { creteDeposit } from '../api/deposit';
 
 type DepositProps = {
     chains: Chain[],
@@ -99,6 +100,7 @@ export default function Deposit({chains} : DepositProps){
             txPromiEvent.on('transactionHash', (hash: string) => {
                 setTxHash(hash);
                 setRunningTx(true);
+                creteDeposit(address?.toString() as string, 'deposit', 'initiate', amount.toString(), hash);
             });
 
             // Subscribe to the confirmation event
