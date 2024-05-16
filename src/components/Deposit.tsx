@@ -1,5 +1,5 @@
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import { Box, Button, Divider, Grid, IconButton, InputBase, LoadingButton, Modal, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid, IconButton, InputBase, LinearProgress, Modal, Paper, Stack, Typography } from "@mui/material";
 import { Chain } from "@rainbow-me/rainbowkit";
 import Balance from "./Balance";
 import { useERC20Allowance } from "../hooks/useERC20Allowance";
@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { switchChain } from "viem/actions";
 import { optimismPortalProxyABI } from "../constants/contracts";
 import Web3 from 'web3'
+import { ContentCopy } from "@mui/icons-material";
 
 type DepositProps = {
     chains: Chain[],
@@ -20,6 +21,8 @@ export default function Deposit({chains} : DepositProps){
     const web3 = new Web3(window.ethereum)
 
     const [runningTx, setRunningTx] = useState(false);
+    const [isTxComplete, setIsTxComplete] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [txHash, setTxHash] = useState('');
 
     const [gasLimit, setGasLimit] = useState(0);
@@ -77,29 +80,46 @@ export default function Deposit({chains} : DepositProps){
     }
 
     async function callDeposit() {
-        setRunningTx(true);
-        const contract = new web3.eth.Contract(optimismPortalProxyABI, (chains[0].contracts!.optimismPortalProxy as ChainContract).address)
+            setRunningTx(true);
+            setIsTxComplete(false);
+            setError(null);
 
-        const functionArgs = {
-            from: address,
-            gas: gasLimit.toString(), // Set your desired gas limit here
-          }
-          // Call the specific function on the contract
-          await contract.methods.depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x',)
-            .send(functionArgs)
-            .then((res) => {
-              setTxHash(res.transactionHash);
-              setRunningTx(false);
-            })
-            .catch((error) => {
-              console.log(error)
-              setRunningTx(false);
-            })
+            const contract = new web3.eth.Contract(optimismPortalProxyABI, (chains[0].contracts!.optimismPortalProxy as ChainContract).address)
 
+            const functionArgs = {
+                from: address,
+                gas: gasLimit.toString(), // Set your desired gas limit here
+            }
+            // Send the transaction and subscribe to the transactionHash event
+            const txPromiEvent = contract.methods
+            .depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x')
+            .send(functionArgs);
+
+            // Subscribe to the transactionHash event
+            txPromiEvent.on('transactionHash', (hash: string) => {
+                setTxHash(hash);
+                setRunningTx(true);
+            });
+
+            // Subscribe to the confirmation event
+            txPromiEvent.on('confirmation', (confirmations) => {
+                if (confirmations.confirmations > 0) {
+                    setRunningTx(false);
+                    setIsTxComplete(true);
+                }
+            });
+
+            // Handle errors
+            txPromiEvent.on('error', (error) => {
+                console.error('Transaction error:', error);
+                setRunningTx(false);
+                setError(error.message);
+            });
     }
 
 
     async function showReviewModal() {
+        setError(null);
         estimateGas();
         handleOpen();
     }
@@ -128,6 +148,7 @@ export default function Deposit({chains} : DepositProps){
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+        
         >
         <Box sx={{
         position: 'absolute',
@@ -154,20 +175,26 @@ export default function Deposit({chains} : DepositProps){
             <Typography variant='body2'>
                 Estimated Gas: {Web3.utils.fromWei(gas, 'ether')} ETH
             </Typography>
+            {txHash && <Stack direction='row' alignItems='center' gap={1}>
+                <Typography variant="body2" noWrap>Transaction Hash: {txHash}</Typography>
+                <ContentCopy fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} onClick={() => {navigator.clipboard.writeText(txHash)}} titleAccess="Copy To Clipboard"/>
+            </Stack>}
             </Stack>
             <Typography variant='caption'>Time to transfer: ~1 minute</Typography>
-            {txHash ? (
-                <Typography variant="body1">
+            {txHash && !error ? (
+                <Stack gap={1} marginTop={2}>
+                <LinearProgress />
                 <Button
                     className="cursor-pointer underline"
                     href={`${chains[0].blockExplorers?.default.url}/tx/${txHash}`}
                     target='_blank'
-                    variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}}
+                    variant='contained' sx={{padding: 1, width: '100%', borderRadius: 2}}
                 >
                     View Transaction
                 </Button>
-                </Typography>
+                </Stack>
             ) : <Button color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeDeposit}>{ runningTx ? 'Sending Deposit' : 'Confirm Deposit' }</Button>}
+            {error && <Typography color='red' variant="caption">There was an error : {error}</Typography>}
             </Box>
         </Modal>
         <Stack gap={2} alignItems='center'> 
