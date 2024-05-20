@@ -14,13 +14,15 @@ import { finalize, prove } from "../utils/withdrawal";
 type ActivityProps = {
     chains: Chain[],
 }
+type DepositQueryAndStatus= DepositQuery & { status: string}
+type WithdrawalQueryAndStatus= WithdrawalQuery & { status: string}
 
 export default function Activity({chains}: ActivityProps){
     const { address, chain } = useAccount();
     const [value, setValue] = useState("deposits" as "deposits" | "withdrawals");
     const { mode } = useColorScheme();
-    const [deposits, setDeposits] = useState([] as DepositQuery[]);
-    const [withdrawals, setWithdrawals] = useState([] as WithdrawalQuery[]);
+    const [deposits, setDeposits] = useState([] as DepositQueryAndStatus[]);
+    const [withdrawals, setWithdrawals] = useState([] as WithdrawalQueryAndStatus[]);
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
@@ -55,8 +57,10 @@ export default function Activity({chains}: ActivityProps){
 
     
     async function getActivityDetails() {
-        const details = await getAcitivity(transactionId);
-        setTransactionDetails(details);
+        if (transactionId) {
+            const details = await getAcitivity(transactionId);
+            setTransactionDetails(details);
+        }
     }
 
     useEffect(()=>{
@@ -156,7 +160,7 @@ export default function Activity({chains}: ActivityProps){
                     <Typography noWrap>Transaction Hash: {transactionDetails?.transaction_hash}</Typography>
                     <ContentCopy fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} onClick={() => {navigator.clipboard.writeText(transactionDetails!.transaction_hash)}} titleAccess="Copy To Clipboard"/>
                 </Stack>
-                <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype}d</span></Typography>
+                <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.status}</span></Typography>
 
                 <Stack gap={1} marginTop={2}>
                     {isRunning && <LinearProgress variant='indeterminate' /> }
@@ -218,7 +222,7 @@ export default function Activity({chains}: ActivityProps){
                                 <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(parseFloat(deposit.amount), 'ether')} ETH</Typography>
                                 <Typography variant="caption" textAlign='left'>{new Date(deposit.created_at).toString()}</Typography>
                             </Stack>
-                            <Typography marginLeft='auto' variant='h6' color='green'>Completed</Typography>
+                            <Typography marginLeft='auto' variant='h6' color={deposit.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{deposit.status as string}</span></Typography>
                         </Stack>
                         </div>
                    </Stack>)) : withdrawals.sort((a, b) => {
@@ -244,7 +248,7 @@ export default function Activity({chains}: ActivityProps){
                                     <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(withdrawal.amount, 'ether')} ETH</Typography>
                                     <Typography variant="caption" textAlign='left'>{new Date(withdrawal.created_at).toString()}</Typography>
                                 </Stack>
-                                <Typography marginLeft='auto' variant='h6' color='green'>Completed</Typography>
+                                <Typography marginLeft='auto' variant='h6' color={withdrawal.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{withdrawal.status as string}</span></Typography>
                             </Stack>
                         </div>
                    </Stack>))}
