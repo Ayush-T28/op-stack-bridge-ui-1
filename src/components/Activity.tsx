@@ -10,7 +10,6 @@ import { Chain } from "@rainbow-me/rainbowkit";
 import { getAcitivity, getInitiateAcitivity } from "../api/activity";
 import { formatTimestamp } from "../utils/date";
 import { finalize, prove } from "../utils/withdrawal";
-import { waitForReceipt } from "../utils/web3";
   
 type ActivityProps = {
     chains: Chain[],
