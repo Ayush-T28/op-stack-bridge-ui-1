@@ -5,12 +5,13 @@ import Balance from "./Balance";
 import { useERC20Allowance } from "../hooks/useERC20Allowance";
 import { useAccount, usePublicClient } from "wagmi";
 import { Address, ChainContract } from "viem";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { switchChain } from "viem/actions";
 import { optimismPortalProxyABI } from "../constants/contracts";
 import Web3 from 'web3'
 import { ContentCopy } from "@mui/icons-material";
-import { creteDeposit } from '../api/deposit';
+import { createDeposit } from '../api/deposit';
+import { TokenContext } from "../App";
 
 type DepositProps = {
     chains: Chain[],
@@ -32,8 +33,10 @@ export default function Deposit({chains} : DepositProps){
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    const token = useContext(TokenContext);
+
     const { allowance, approve } = useERC20Allowance({
-        token: '0x90fa379e947fDe331f3465d19845A8eB5031AC0B',
+        token: token.address as `0x${string}`,
         chainId: chains[0].id,
         amount: BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
         owner: address as Address,
@@ -43,9 +46,6 @@ export default function Deposit({chains} : DepositProps){
 
 
     async function approveSpending() {
-        if(chain !== chains[0]){
-            await switchChain(window.ethereum!, {id: chains[0].id});
-        }
         const shouldApprove = allowance.data! < amount;
         if (shouldApprove) {
             const approvalTxHash = await approve()
@@ -100,7 +100,7 @@ export default function Deposit({chains} : DepositProps){
             txPromiEvent.on('transactionHash', (hash: string) => {
                 setTxHash(hash);
                 setRunningTx(true);
-                creteDeposit(address?.toString() as string, 'deposit', 'initiate', amount.toString(), hash);
+                createDeposit(address?.toString() as string, 'deposit', 'initiate', amount.toString(), hash);
             });
 
             // Subscribe to the confirmation event
@@ -121,6 +121,9 @@ export default function Deposit({chains} : DepositProps){
 
 
     async function showReviewModal() {
+        if(chain !== chains[0]){
+            await switchChain(window.ethereum!, {id: chains[0].id});
+        }
         setError(null);
         estimateGas();
         handleOpen();
@@ -186,6 +189,7 @@ export default function Deposit({chains} : DepositProps){
             {txHash && !error ? (
                 <Stack gap={1} marginTop={2}>
                 {runningTx && <LinearProgress variant='indeterminate' /> }
+                {isTxComplete && <Typography variant='caption' textAlign='center' color='green'>Transaction Complete</Typography>}
                 <Button
                     className="cursor-pointer underline"
                     href={`${chains[0].blockExplorers?.default.url}/tx/${txHash}`}
@@ -222,8 +226,8 @@ export default function Deposit({chains} : DepositProps){
                 />
                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                 <IconButton color="primary" sx={{ padding: '10px' }} aria-label="directions">
-                    <img src="/ethereum.png" height={35} />
-                    <Typography marginLeft={1}>ETH</Typography>
+                    <img src={token.iconUrl} height={35} />
+                    <Typography marginLeft={1}>{token.symbol}</Typography>
                 </IconButton>
             </Paper>
 

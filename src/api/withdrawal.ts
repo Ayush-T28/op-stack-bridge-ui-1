@@ -20,11 +20,10 @@ export async function createWithdrawal(
 
 export async function updateWithdrawal(
     withdrawalId: string,
-    account: string, type: 'withdrawal',
-    subtype: 'prove' | 'finalize', amount: string, transactionHash: string
+    subtype: 'prove' | 'finalize',  transactionHash: string
 ): Promise<{message: string, success: boolean}> {
     const data = (await axiosBackendInstance.post(`/withdrawal/${withdrawalId}`, {
-        account, type, subtype, amount, transactionHash
+        subtype, transactionHash
     })).data;
     
     return data as {message: string, success: boolean};

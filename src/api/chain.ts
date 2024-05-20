@@ -30,8 +30,12 @@ export async function getChain(level: "l1"|"l2"): Promise<Chain> {
     }
     else{
         chain.contracts = {
-            "L2OutputOracleProxy": {
+            "l2OutputOracle": {
                 address: data.l2OutputOracleProxy,
+                blockCreated: 0,
+            },
+            "l2ToL1MessagePasserProxy": {
+                address: data.l2ToL1MessagePasserProxy,
                 blockCreated: 0,
             }
         }

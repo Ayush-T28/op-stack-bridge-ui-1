@@ -37,7 +37,7 @@ export type DepositQuery = {
   id: string;
   account: string;
   type: 'deposit';
-  amount: number;
+  amount: string;
   currency_symbol: string;
   created_at: Date;
 };
@@ -47,7 +47,7 @@ export type Withdrawal = {
   id: string;
   account: string;
   type: 'withdrawal';
-  amount: number;
+  amount: string;
   currencySymbol: string;
   createdAt: Date;
 };
@@ -65,20 +65,28 @@ export type WithdrawalQuery = {
 
 export type Activity = {
   id: string;
-  transactionId: string;
-  subtype: WithdrawalSubtype;
-  transactionHash: string;
-  createdAt: Date;
+  transaction_id: string;
+  subtype: "initiate";
+  transaction_hash: string;
+  created_at: string;
   status: TransactionStatus;
+  account: string;
+  type: "deposit";
+  amount: string;
+  currency_symbol: "eth";
 }
 
 export type ActivityQuery = {
   id: string;
   transaction_id: string;
-  subtype: string;
+  subtype: "initiate";
   transaction_hash: string;
-  created_at: Date;
+  created_at: string;
   status: TransactionStatus;
+  account: string;
+  type: "deposit";
+  amount: string;
+  currency_symbol: "eth";
 };
 
 

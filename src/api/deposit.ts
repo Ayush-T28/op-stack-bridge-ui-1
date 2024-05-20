@@ -6,7 +6,7 @@ export async function getDeposits(account: string): Promise<DepositQuery[]> {
     return data;
 }
 
-export async function creteDeposit(
+export async function createDeposit(
     account: string, type: 'deposit',
     subtype: 'initiate', amount: string, transactionHash: string
 ): Promise<{message: string, success: boolean}> {

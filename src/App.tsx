@@ -4,7 +4,7 @@ import Bridge from './components/Bridge';
 import {Chain, getDefaultConfig, RainbowKitProvider} from '@rainbow-me/rainbowkit';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {WagmiProvider} from 'wagmi';
-import { useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import {
   BrowserRouter,
   Route,
@@ -13,6 +13,16 @@ import {
 import Activity from './components/Activity';
 import { getChain } from './api/chain';
 import { mainnet, optimism } from 'viem/chains';
+import { getToken } from './api/token';
+
+export const TokenContext = createContext({
+    name: "",
+    symbol: "",
+    decimals: 18,
+    address: "",
+    iconUrl: "",
+});
+
 
 function App() {
 
@@ -20,16 +30,17 @@ function App() {
     const [chains, setChains] = useState<Chain[]>([mainnet, optimism]);
 
     const [customToken, setCustomToken] = useState({
-        name: "BridgeUI",
-        symbol: "BUI",
+        name: "",
+        symbol: "",
         decimals: 18,
-        address: "0x90fa379e947fDe331f3465d19845A8eB5031AC0B",
+        address: "",
+        iconUrl: ""
     });
 
     const config = getDefaultConfig({
         appName: 'Optimism Bridge',
         projectId: '62707a90c9737f0d7d60d8ec06a8b45a',
-        chains: chains,
+        chains: chains as any,
         ssr: false, // If your dApp uses server side rendering (SSR)
     });
 
@@ -40,14 +51,26 @@ function App() {
         const l1 = await getChain('l1');
         const l2 = await getChain('l2');
         setChains([l1, l2]);
+    }
+
+
+    async function getTokenDetails(){
+        const token = await getToken();
+        setCustomToken(token);
+    }
+
+    async function getDetails() {
+        await getTokenDetails();
+        await getChains();
         setLoaded(true);
     }
 
     useEffect(()=>{
-        getChains();
+        getDetails();
     } , []);
 
     return (
+    <TokenContext.Provider value={customToken}>
       <BrowserRouter>
         {loaded && <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
@@ -63,13 +86,14 @@ function App() {
                         <Divider/>
                         <Routes>
                           <Route element={<Bridge loaded={loaded} chains={chains}/>} index path='/' />
-                          <Route element={<Activity />}  path='/activity' />
+                          <Route element={<Activity chains={chains}/>}  path='/activity' />
                         </Routes>
                     </Stack>
                 </RainbowKitProvider>
             </QueryClientProvider>
         </WagmiProvider>}
         </BrowserRouter>
+    </TokenContext.Provider>
     );
 }
 
