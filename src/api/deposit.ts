@@ -1,8 +1,7 @@
 import { DepositQuery } from "../types";
 import axiosBackendInstance from "../utils/axios";
 
-type DepositQueryAndStatus= DepositQuery & { status: string}
-export async function getDeposits(account: string): Promise<DepositQueryAndStatus[]> {
+export async function getDeposits(account: string): Promise<DepositQuery[]> {
     const data = (await axiosBackendInstance.get(`/deposit/${account}`)).data.data;
     return data;
 }
