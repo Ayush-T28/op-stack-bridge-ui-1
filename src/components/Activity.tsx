@@ -94,7 +94,6 @@ export default function Activity({chains}: ActivityProps){
                 }
                 else {
                     setIsTxComplete(true);
-                    setError(err);
                     setIsRunning(false);
                 }
                 
@@ -113,7 +112,6 @@ export default function Activity({chains}: ActivityProps){
                 }
                 else {
                     setIsTxComplete(true);
-                    setError(err);
                     setIsRunning(false);
                 }
                 await updateWithdrawal(transactionDetails.id, 'finalize', tx);
@@ -196,7 +194,7 @@ export default function Activity({chains}: ActivityProps){
                 <Tab value="withdrawals" label="Withdrawls" iconPosition='start' icon={<ArrowUpward />}/>
             </Tabs>
             <Box width='100%' textAlign='center' marginX='auto' py={5} height='90%'>
-                <Stack gap={2} overflow='scroll' maxHeight='100%' p={2} height='100%'>
+                <Stack gap={2} overflow='auto' maxHeight='100%' p={2} height='100%'>
                     {value === 'deposits' ? deposits.sort((a, b) => {
                     // Convert string timestamps to Date objects
                     const dateA = new Date(a.created_at);

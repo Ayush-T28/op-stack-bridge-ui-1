@@ -110,7 +110,7 @@ export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chai
     return [hash, null];
     }
     catch(err: any){
-        return [null, err.details]
+        return [null, err]
     }
 }
 
@@ -173,6 +173,6 @@ export async function finalize(transaction_hash: '0x${string}', l1: Chain, l2: C
             return [hash, null];
       }
       catch(err: any){
-            return [null, err.details]
+            return [null, err]
       }
 }
