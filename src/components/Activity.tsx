@@ -161,7 +161,7 @@ export default function Activity({chains}: ActivityProps){
                 <Stack gap={1} marginTop={2}>
                     {isRunning && <LinearProgress variant='indeterminate' /> }
                     {error.length > 0 && <Typography variant='body2' textAlign='center' color='red'>{error}</Typography>}
-                    {isTxComplete && <Typography variant='caption' textAlign='center' color='green'>Transaction Complete</Typography>}
+                    {isTxComplete && <Typography variant='caption' textAlign='center' color='green'>Transaction Sent</Typography>}
                     <Button disabled={error.length !== 0} color="secondary" variant='contained' sx={{padding: 1, width: '100%', borderRadius: 2}} onClick={() => handleButtonClick()}>
                         {type === 'deposit' ? 'View in explorer' : 
                         transactionDetails?.subtype === 'initiate' ? 'Prove Withdrawal' : 
