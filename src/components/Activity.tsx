@@ -156,7 +156,7 @@ export default function Activity({chains}: ActivityProps){
                     <Typography noWrap>Transaction Hash: {transactionDetails?.transaction_hash}</Typography>
                     <ContentCopy fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} onClick={() => {navigator.clipboard.writeText(transactionDetails!.transaction_hash)}} titleAccess="Copy To Clipboard"/>
                 </Stack>
-                <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype}</span></Typography>
+                <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype}d</span></Typography>
 
                 <Stack gap={1} marginTop={2}>
                     {isRunning && <LinearProgress variant='indeterminate' /> }
@@ -218,7 +218,7 @@ export default function Activity({chains}: ActivityProps){
                                 <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(parseFloat(deposit.amount), 'ether')} ETH</Typography>
                                 <Typography variant="caption" textAlign='left'>{new Date(deposit.created_at).toString()}</Typography>
                             </Stack>
-                            <Typography marginLeft='auto' variant='h6' color={deposit.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{deposit.subtype as string}</span></Typography>
+                            <Typography marginLeft='auto' variant='h6' color={deposit.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{deposit.subtype as string}d</span></Typography>
                         </Stack>
                         </div>
                    </Stack>)) : withdrawals.sort((a, b) => {
@@ -244,7 +244,7 @@ export default function Activity({chains}: ActivityProps){
                                     <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(withdrawal.amount, 'ether')} ETH</Typography>
                                     <Typography variant="caption" textAlign='left'>{new Date(withdrawal.created_at).toString()}</Typography>
                                 </Stack>
-                                <Typography marginLeft='auto' variant='h6' color={withdrawal.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{withdrawal.subtype as string}</span></Typography>
+                                <Typography marginLeft='auto' variant='h6' color={withdrawal.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{withdrawal.subtype as string}d</span></Typography>
                             </Stack>
                         </div>
                    </Stack>))}
