@@ -1,5 +1,6 @@
 import { ApiResponse, WithdrawalQuery } from "../types";
 import axiosBackendInstance from "../utils/axios";
+type WithdrawalQueryAndStatus= WithdrawalQuery & { status: string, subtype: string}
 
 export async function getWithdrawals(account: string): Promise<WithdrawalQuery[]> {
     const data = (await axiosBackendInstance.get(`/withdrawal/${account}`)).data.data;
