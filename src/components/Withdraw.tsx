@@ -11,6 +11,7 @@ import { l2ToL1MessagePasserProxyABI } from "../constants/contracts";
 import { TokenContext } from "../App";
 import { createWithdrawal } from "../api/withdrawal";
 import { addChain } from "../utils/metamask";
+import { switchChain } from "viem/actions";
 
 type WithdrawProps = {
     chains: Chain[],
