@@ -59,11 +59,13 @@ export default function Deposit({chains} : DepositProps){
         const functionArgs = {
             from: address,
         }
+
+        console.log({address, amount});
     
         const gasLimit = await contract.methods.depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x',)
             .estimateGas(functionArgs)
             .catch((error) => {
-                console.log(error)
+                console.log("failed to estimate gas: ", error)
         })
 
            
