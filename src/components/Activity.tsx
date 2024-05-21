@@ -21,8 +21,8 @@ export default function Activity({chains}: ActivityProps){
     const { address, chain } = useAccount();
     const [value, setValue] = useState("deposits" as "deposits" | "withdrawals");
     const { mode } = useColorScheme();
-    const [deposits, setDeposits] = useState([] as DepositQuery[]);
-    const [withdrawals, setWithdrawals] = useState([] as WithdrawalQuery[]);
+    const [deposits, setDeposits] = useState([] as DepositQueryAndStatus[]);
+    const [withdrawals, setWithdrawals] = useState([] as WithdrawalQueryAndStatus[]);
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
