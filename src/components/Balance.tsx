@@ -20,7 +20,9 @@ export default function Balance({rpc, level}: BalanceProps){
       });
 
       const getBalance = async () => {
-        console.log(address);
+        if(!address){
+          return;
+        }
         if (level === 'l2') {
           const walletAddress = address as `0x${string}`;
           const web3 = new Web3(new Web3.providers.HttpProvider(rpc));

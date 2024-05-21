@@ -14,6 +14,7 @@ import Activity from './components/Activity';
 import { getChain } from './api/chain';
 import { mainnet, optimism } from 'viem/chains';
 import { getToken } from './api/token';
+import { addChain } from './utils/metamask';
 
 export const TokenContext = createContext({
     name: "",
@@ -25,7 +26,6 @@ export const TokenContext = createContext({
 
 
 function App() {
-
     const [loaded, setLoaded] = useState<boolean>(false);
     const [chains, setChains] = useState<Chain[]>([mainnet, optimism]);
 
@@ -45,7 +45,16 @@ function App() {
     });
 
     const queryClient = new QueryClient();
-
+    
+    async function addL1Chain() {
+        const l1 = chains[0];
+        await addChain(l1, customToken);
+    }
+    
+    async function addL2Chain() {
+        const l2 = chains[1];
+        await addChain(l2, customToken);
+    }
 
     async function getChains(){
         const l1 = await getChain('l1');
@@ -68,6 +77,14 @@ function App() {
     useEffect(()=>{
         getDetails();
     } , []);
+
+
+    useEffect(()=>{
+        if(window.ethereum){
+            addL1Chain();
+            addL2Chain();
+        }
+    }, [window.ethereum])
 
     return (
     <TokenContext.Provider value={customToken}>

@@ -9,8 +9,8 @@ import { useAccount } from "wagmi";
 import { ChainContract } from "viem";
 import { l2ToL1MessagePasserProxyABI } from "../constants/contracts";
 import { TokenContext } from "../App";
-import { switchChain } from "viem/actions";
 import { createWithdrawal } from "../api/withdrawal";
+import { addChain } from "../utils/metamask";
 
 type WithdrawProps = {
     chains: Chain[],
@@ -114,6 +114,7 @@ export default function Withdraw({chains}: WithdrawProps){
 
     async function showReviewModal() {
         if(chain !== chains[1]){
+            await addChain(chains[1], token);
             await switchChain(window.ethereum!, {id: chains[1].id});
         }
         setError(null);
