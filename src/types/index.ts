@@ -66,7 +66,7 @@ export type WithdrawalQuery = {
 export type Activity = {
   id: string;
   transaction_id: string;
-  subtype: "initiate";
+  subtype: string;
   transaction_hash: string;
   created_at: string;
   status: TransactionStatus;

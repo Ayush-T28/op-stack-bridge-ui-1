@@ -8,7 +8,7 @@ import { Activity as ActivityType, DepositQuery, WithdrawalQuery } from "../type
 import { getWithdrawals, updateWithdrawal } from "../api/withdrawal";
 import { Chain } from "@rainbow-me/rainbowkit";
 import { getAcitivity, getInitiateAcitivity } from "../api/activity";
-import { formatTimestamp } from "../utils/date";
+import { formatTime, formatTimestamp, getSecondsDifferenceFromNow } from "../utils/date";
 import { finalize, prove } from "../utils/withdrawal";
   
 type ActivityProps = {
@@ -36,6 +36,10 @@ export default function Activity({chains}: ActivityProps){
     const [type, setType] = useState<"deposit" | "withdrawl">("deposit");
 
     const [transactionDetails, setTransactionDetails] = useState<ActivityType>();
+
+    const [buttonDisabled, setButtonDisabled] = useState(false);
+
+    const [timeUntilFinalize, setTimeUntilFinalize] = useState(0);
 
     async function getTransactions() {
         if (address) {
@@ -86,10 +90,15 @@ export default function Activity({chains}: ActivityProps){
             if(transactionDetails?.subtype === 'initiate'){
                 setIsRunning(true);
                 const [tx, err] = await prove(initateTx.transaction_hash as '0x${string}', chains[0], chains[1], chain!);
-                if(!tx){
+                if(err){
                     setIsRunning(false);
-                    setError(err!);
                     setIsTxComplete(false);
+                    if(err.toString().includes('cannot get output for a block that has not been proposed')){
+                        setError("Block not proposed yet. Try again in 30 mins");
+                    }
+                    else{
+                        setError(err);
+                    }
                     return;
                 }
                 else {
@@ -122,6 +131,32 @@ export default function Activity({chains}: ActivityProps){
             }
         }
     }
+
+    useEffect(()=>{
+        if(error.length > 0){
+            setButtonDisabled(true);
+        }
+        else if(transactionDetails?.subtype === 'prove'){
+            const timeSinceProof = getSecondsDifferenceFromNow(transactionDetails.created_at);
+            const finalizationPeriod = chains[1].custom!.finalizationPeriod as number;
+            let timeLeft = finalizationPeriod - timeSinceProof;
+            console.log({timeSinceProof, finalizationPeriod, timeLeft})
+            if(timeLeft < 0){
+                timeLeft = 0;
+            }
+            setTimeUntilFinalize(timeLeft)
+            if(timeLeft > 0){
+                setButtonDisabled(true);
+            }
+            else{
+                setButtonDisabled(false)
+            }
+        }
+        else{
+            setButtonDisabled(false);
+        }
+    }, [error, transactionDetails, chains]);
+    
 
     return (
     <>
@@ -161,8 +196,9 @@ export default function Activity({chains}: ActivityProps){
                 <Stack gap={1} marginTop={2}>
                     {isRunning && <LinearProgress variant='indeterminate' /> }
                     {error.length > 0 && <Typography variant='body2' textAlign='center' color='red'>{error}</Typography>}
+                    {error.length === 0 && buttonDisabled && <Typography variant='body2' textAlign='center' color='red'>Withdrawal can be finalized after {formatTime(timeUntilFinalize)}</Typography>}
                     {isTxComplete && <Typography variant='caption' textAlign='center' color='green'>Transaction Sent</Typography>}
-                    <Button disabled={error.length !== 0} color="secondary" variant='contained' sx={{padding: 1, width: '100%', borderRadius: 2}} onClick={() => handleButtonClick()}>
+                    <Button disabled={buttonDisabled} color="secondary" variant='contained' sx={{padding: 1, width: '100%', borderRadius: 2}} onClick={() => handleButtonClick()}>
                         {type === 'deposit' ? 'View in explorer' : 
                         transactionDetails?.subtype === 'initiate' ? 'Prove Withdrawal' : 
                         transactionDetails?.subtype === 'prove' ? 'Finalize Withdrawal' : 

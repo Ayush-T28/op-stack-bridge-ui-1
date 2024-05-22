@@ -12,6 +12,7 @@ import { TokenContext } from "../App";
 import { createWithdrawal } from "../api/withdrawal";
 import { addChain } from "../utils/metamask";
 import { switchChain } from "viem/actions";
+import { formatTime } from "../utils/date";
 
 type WithdrawProps = {
     chains: Chain[],
@@ -169,7 +170,7 @@ export default function Withdraw({chains}: WithdrawProps){
                 <ContentCopy fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} onClick={() => {navigator.clipboard.writeText(txHash)}} titleAccess="Copy To Clipboard"/>
             </Stack>}
             </Stack>
-            <Typography variant='caption'>Time to transfer: ~7 days</Typography>
+            <Typography variant='caption'>Time to transfer: ~{formatTime(chains[1].custom!.finalizationPeriod as number)}</Typography>
             {txHash && !error ? (
                 <Stack gap={1} marginTop={2}>
                 {runningTx && <LinearProgress variant='indeterminate' /> }
@@ -183,7 +184,7 @@ export default function Withdraw({chains}: WithdrawProps){
                     View Transaction
                 </Button>
                 </Stack>
-            ) : <Button color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeWithdrawl}>{ runningTx ? 'Initating Withdrawl' : 'Initiate Withdrawl' }</Button>}
+            ) : <Button disabled={gas === 0} color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeWithdrawl}>{ runningTx ? 'Initating Withdrawl' : gas === 0 ? 'Estimating Gas' : 'Initiate Withdrawl' }</Button>}
             {error && <Typography color='red' variant="caption" noWrap>There was an error : {error}</Typography>}
             </Box>
         </Modal>

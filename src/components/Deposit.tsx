@@ -201,7 +201,7 @@ export default function Deposit({chains} : DepositProps){
                     View Transaction
                 </Button>
                 </Stack>
-            ) : <Button color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeDeposit}>{ runningTx ? 'Sending Deposit' : 'Confirm Deposit' }</Button>}
+            ) : <Button disabled={gas === 0} color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeDeposit}>{ runningTx ? 'Sending Deposit' : gas === 0 ? 'Estimating Gas' : 'Confirm Deposit' }</Button>}
             {error && <Typography color='red' variant="caption" noWrap>There was an error : {error}</Typography>}
             </Box>
         </Modal>

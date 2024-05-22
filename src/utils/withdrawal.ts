@@ -4,6 +4,8 @@ import { getTransactionReceipt, switchChain } from "viem/actions";
 import { chainConfig, getWithdrawals, publicActionsL1, publicActionsL2, walletActionsL1 } from 'viem/op-stack'
 
 export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chain, currentChain: Chain){
+    try{
+
     if(currentChain !== l1){
         await switchChain(window.ethereum!, {id: l1.id});
     }
@@ -77,40 +79,32 @@ export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chai
 
     const [withdrawal] = getWithdrawals(receipt);
 
-    let output;
-
-    try{
-        output = await l1Client.getL2Output({
+    const output = await l1Client.getL2Output({
         l2BlockNumber: receipt.blockNumber,
         targetChain: customL1Chain,
         })
-    }
-    catch(err){
-        console.log(err);
-        return [null, 'Block not proposed yet. Try again after 15 minutes']
-    }
-    
-    try{
-        const args = await l2Client.buildProveWithdrawal({
-            chain: l1,
-            account,
-            output,
-            withdrawal: withdrawal,
-        })
+
         
-        const hash = await walletClientL1.proveWithdrawal({
-            account,
-            l2OutputIndex: output.outputIndex,
-            outputRootProof: args.outputRootProof,
-            withdrawalProof: args.withdrawalProof,
-            withdrawal,
-            targetChain: customL2Chain,
-        });
+    const args = await l2Client.buildProveWithdrawal({
+        chain: l1,
+        account,
+        output,
+        withdrawal: withdrawal,
+    })
+    
+    const hash = await walletClientL1.proveWithdrawal({
+        account,
+        l2OutputIndex: output.outputIndex,
+        outputRootProof: args.outputRootProof,
+        withdrawalProof: args.withdrawalProof,
+        withdrawal,
+        targetChain: customL2Chain,
+    });
 
     return [hash, null];
     }
     catch(err: any){
-        return [null, err]
+        return [null, err.cause]
     }
 }
 

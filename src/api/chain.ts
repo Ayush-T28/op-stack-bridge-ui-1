@@ -39,6 +39,10 @@ export async function getChain(level: "l1"|"l2"): Promise<Chain> {
                 blockCreated: 0,
             }
         }
+
+        chain.custom = {
+            "finalizationPeriod" : data.finalizationPeriod
+        }
     }
 
     return chain;
