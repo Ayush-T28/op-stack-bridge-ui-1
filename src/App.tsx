@@ -1,5 +1,6 @@
 import {Divider, Stack} from '@mui/material';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import Bridge from './components/Bridge';
 import {Chain, getDefaultConfig, RainbowKitProvider} from '@rainbow-me/rainbowkit';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -105,6 +106,7 @@ function App() {
                           <Route element={<Bridge loaded={loaded} chains={chains}/>} index path='/' />
                           <Route element={<Activity chains={chains}/>}  path='/activity' />
                         </Routes>
+                        <Footer />
                     </Stack>
                 </RainbowKitProvider>
             </QueryClientProvider>
