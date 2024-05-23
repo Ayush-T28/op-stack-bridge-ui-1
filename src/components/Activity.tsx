@@ -227,7 +227,7 @@ export default function Activity({chains}: ActivityProps){
                 indicatorColor="primary"
             >
                 <Tab value="deposits" label="Deposits" iconPosition='start' icon={<ArrowDownward />}/>
-                <Tab value="withdrawals" label="Withdrawls" iconPosition='start' icon={<ArrowUpward />}/>
+                <Tab value="withdrawals" label="Withdrawals" iconPosition='start' icon={<ArrowUpward />}/>
             </Tabs>
             <Box width='100%' textAlign='center' marginX='auto' py={5} height='90%'>
                 <Stack gap={2} overflow='auto' maxHeight='100%' p={2} height='100%'>
