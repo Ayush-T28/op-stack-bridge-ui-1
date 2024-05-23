@@ -67,13 +67,11 @@ export default function Deposit({chains} : DepositProps){
             .catch((error) => {
                 console.log("failed to estimate gas: ", error)
         })
-
            
         if (!gasLimit) {
-            setGas(-1);
+            setGas(0);
             return;
         }
-
 
         const gasPrice = await web3.eth.getGasPrice();
         const gasCostWei = gasLimit * gasPrice;
@@ -177,7 +175,7 @@ export default function Deposit({chains} : DepositProps){
             <Divider sx={{marginTop: 3}}/>
             <Stack gap={1} paddingY={3}>
             <Typography variant='body2'>
-                You are sending: {Web3.utils.fromWei(amount, 'ether')} ETH
+                You are sending: {Web3.utils.fromWei(amount, 'ether')} {token.symbol}
             </Typography>
             <Typography variant='body2'>
                 Estimated Gas: {Web3.utils.fromWei(gas, 'ether')} ETH
@@ -221,7 +219,7 @@ export default function Deposit({chains} : DepositProps){
                 <InputBase
                     sx={{ ml: 1, flex: 1 }}
                     placeholder="Amount"
-                    onChange={(e)=>{setAmount(parseFloat(Web3.utils.toWei(parseFloat(e.target.value), 'ether')))}}
+                    onChange={(e)=>{setAmount(parseFloat(Web3.utils.toWei(parseFloat(e.target.value || "0"), 'ether')))}}
                     inputProps={{ 'aria-label': 'search google maps' }}
                     defaultValue={0.00}
                     autoFocus

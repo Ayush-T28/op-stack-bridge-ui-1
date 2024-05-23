@@ -51,7 +51,7 @@ export default function Withdraw({chains}: WithdrawProps){
 
            
         if (!gasLimit) {
-            setGas(-1);
+            setGas(0);
             return;
         }
 
@@ -160,10 +160,10 @@ export default function Withdraw({chains}: WithdrawProps){
             <Divider sx={{marginTop: 3}}/>
             <Stack gap={1} paddingY={3}>
             <Typography variant='body2'>
-                You are withdrawing: {Web3.utils.fromWei(amount, 'ether')} ETH
+                You are withdrawing: {Web3.utils.fromWei(amount, 'ether')} {token.symbol}
             </Typography>
             <Typography variant='body2'>
-                Estimated Gas: {Web3.utils.fromWei(gas, 'ether')} ETH
+                Estimated Gas: {Web3.utils.fromWei(gas, 'ether')} {token.symbol}
             </Typography>
             {txHash && <Stack direction='row' alignItems='center' gap={1}>
                 <Typography variant="body2" noWrap>Transaction Hash: {txHash}</Typography>
@@ -205,7 +205,7 @@ export default function Withdraw({chains}: WithdrawProps){
                 <InputBase
                     sx={{ ml: 1, flex: 1 }}
                     placeholder="Amount"
-                    onChange={(e)=>{setAmount(parseFloat(Web3.utils.toWei(parseFloat(e.target.value), 'ether')))}}
+                    onChange={(e)=>{setAmount(parseFloat(Web3.utils.toWei(parseFloat(e.target.value || "0"), 'ether')))}}
                     inputProps={{ 'aria-label': 'search google maps' }}
                     defaultValue={0.00}
                     autoFocus
