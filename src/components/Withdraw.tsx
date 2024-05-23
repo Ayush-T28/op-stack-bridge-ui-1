@@ -46,9 +46,9 @@ export default function Withdraw({chains}: WithdrawProps){
         const gasLimit = await contract.methods.initiateWithdrawal(address?.toString(), 21000, '0x',)
             .estimateGas(functionArgs)
             .catch((error) => {
-                console.log(error)
-        })
-
+                console.log("error estimating gas", error);
+                setError("Cannot estimate gas. Transaction will likely fail.");
+        });
            
         if (!gasLimit) {
             setGas(0);

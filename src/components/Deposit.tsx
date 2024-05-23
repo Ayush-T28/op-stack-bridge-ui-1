@@ -47,11 +47,11 @@ export default function Deposit({chains} : DepositProps){
 
     async function approveSpending() {
         const shouldApprove = allowance.data! < amount;
-        console.log({allowance: allowance.data!, amount, shouldApprove});
         if (shouldApprove) {
             const approvalTxHash = await approve()
             await l1PublicClient!.waitForTransactionReceipt({ hash: approvalTxHash })
         }
+        await allowance.refetch();
     }
 
     async function estimateGas() {
@@ -60,13 +60,12 @@ export default function Deposit({chains} : DepositProps){
         const functionArgs = {
             from: address,
         }
-
-        console.log({address, amount});
     
         const gasLimit = await contract.methods.depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x',)
             .estimateGas(functionArgs)
             .catch((error) => {
                 console.log("failed to estimate gas: ", error)
+                setError("Cannot estimate gas. Transaction will likely fail.");
         })
            
         if (!gasLimit) {

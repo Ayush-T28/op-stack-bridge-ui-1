@@ -62,7 +62,6 @@ export default function Activity({chains}: ActivityProps){
     
     async function getActivityDetails() {
         const details = await getAcitivity(transactionId);
-        console.log(details);
         setTransactionDetails(details);
     }
 
@@ -141,7 +140,6 @@ export default function Activity({chains}: ActivityProps){
             const timeSinceProof = getSecondsDifferenceFromNow(transactionDetails.created_at);
             const finalizationPeriod = chains[1].custom!.finalizationPeriod as number;
             let timeLeft = finalizationPeriod - timeSinceProof;
-            console.log({timeSinceProof, finalizationPeriod, timeLeft})
             if(timeLeft < 0){
                 timeLeft = 0;
             }

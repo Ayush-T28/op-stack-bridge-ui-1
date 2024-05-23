@@ -18,7 +18,6 @@ export async function addChain(chain: Chain, customToken: any) {
                     blockExplorerUrls: [chain.blockExplorers?.default.url],
                 }];
 
-                console.log(params);
                 // If chain is not present, add it
                 await window.ethereum.request({
                     method: 'wallet_addEthereumChain',
