@@ -25,7 +25,7 @@ export default function Bridge({chains}: BridgeProps) {
             marginX: 'auto',
             height: '90vh',
             width: '97%',
-            backgroundColor: mode === 'light' ? "rgba(255,255,255,0.7)" : '#171717',
+            backgroundColor: mode === 'light' ? "#f3f3f3" : '#171717',
             backdropFilter: 'blur(10px)',
             borderRadius: '20px'
         }}

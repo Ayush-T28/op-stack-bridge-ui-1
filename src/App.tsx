@@ -16,6 +16,7 @@ import { getChain } from './api/chain';
 import { mainnet, optimism } from 'viem/chains';
 import { getToken } from './api/token';
 import { addChain } from './utils/metamask';
+import { rainbowTheme } from './theme';
 
 export const TokenContext = createContext({
     name: "",
@@ -90,7 +91,7 @@ function App() {
       <BrowserRouter>
         {loaded && <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
-                <RainbowKitProvider>
+                <RainbowKitProvider theme={rainbowTheme}>
                     <Stack
                         sx={{
                         background: mode === 'light' ? "#ffffff" : "black",
