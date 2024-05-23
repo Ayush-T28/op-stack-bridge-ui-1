@@ -19,8 +19,7 @@ import { addChain } from './utils/metamask';
 export const TokenContext = createContext({
     name: "",
     symbol: "",
-    decimals: 18,
-    address: "",
+    contractAddress: "",
     iconUrl: "",
 });
 
@@ -32,8 +31,7 @@ function App() {
     const [customToken, setCustomToken] = useState({
         name: "",
         symbol: "",
-        decimals: 18,
-        address: "",
+        contractAddress: "",
         iconUrl: ""
     });
 

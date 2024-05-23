@@ -38,7 +38,7 @@ export default function Balance({rpc, level}: BalanceProps){
           });
         } else {
           const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
-          const contract = new web3.eth.Contract(erc20Abi, token.address)
+          const contract = new web3.eth.Contract(erc20Abi, token.contractAddress)
           const balance: bigint = await contract.methods.balanceOf(address).call();
             setBalance({
               isPending: false,
