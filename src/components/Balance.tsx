@@ -1,8 +1,9 @@
 import { Typography, Skeleton } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { erc20Abi } from "viem";
 import { useAccount } from "wagmi";
 import Web3 from "web3";
+import { TokenContext } from "../App";
 
 type BalanceProps = {
     rpc: string,
@@ -11,6 +12,8 @@ type BalanceProps = {
 
 export default function Balance({rpc, level}: BalanceProps){
     const { address } = useAccount()
+    const token = useContext(TokenContext);
+
 
     const [balance, setBalance] = useState({
         isPending: true,
@@ -35,7 +38,7 @@ export default function Balance({rpc, level}: BalanceProps){
           });
         } else {
           const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
-          const contract = new web3.eth.Contract(erc20Abi, '0x90fa379e947fDe331f3465d19845A8eB5031AC0B')
+          const contract = new web3.eth.Contract(erc20Abi, token.address)
           const balance: bigint = await contract.methods.balanceOf(address).call();
             setBalance({
               isPending: false,
