@@ -36,7 +36,7 @@ export default function Deposit({chains} : DepositProps){
     const token = useContext(TokenContext);
 
     const { allowance, approve } = useERC20Allowance({
-        token: token.address as `0x${string}`,
+        token: token.contractAddress as `0x${string}`,
         chainId: chains[0].id,
         amount: BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
         owner: address as Address,
