@@ -91,7 +91,7 @@ function App() {
       <BrowserRouter>
         {loaded && <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
-                <RainbowKitProvider>
+                <RainbowKitProvider showRecentTransactions>
                     <Stack
                         sx={{
                         background: 'url(/bg.svg)',
