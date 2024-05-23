@@ -1,4 +1,4 @@
-import {Divider, Stack} from '@mui/material';
+import {Divider, Stack, useColorScheme} from '@mui/material';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Bridge from './components/Bridge';
@@ -29,7 +29,7 @@ export const TokenContext = createContext({
 function App() {
     const [loaded, setLoaded] = useState<boolean>(false);
     const [chains, setChains] = useState<Chain[]>([mainnet, optimism]);
-
+    const { mode } = useColorScheme();
     const [customToken, setCustomToken] = useState({
         name: "",
         symbol: "",
@@ -38,54 +38,52 @@ function App() {
         iconUrl: ""
     });
 
-    const config = getDefaultConfig({
-        appName: 'Optimism Bridge',
-        projectId: '62707a90c9737f0d7d60d8ec06a8b45a',
-        chains: chains as any,
-        ssr: false, // If your dApp uses server side rendering (SSR)
-    });
+  const config = getDefaultConfig({
+    appName: "Optimism Bridge",
+    projectId: "62707a90c9737f0d7d60d8ec06a8b45a",
+    chains: chains as any,
+    ssr: false, // If your dApp uses server side rendering (SSR)
+  });
 
-    const queryClient = new QueryClient();
-    
-    async function addL1Chain() {
-        const l1 = chains[0];
-        await addChain(l1, customToken);
+  const queryClient = new QueryClient();
+
+  async function addL1Chain() {
+    const l1 = chains[0];
+    await addChain(l1, customToken);
+  }
+
+  async function addL2Chain() {
+    const l2 = chains[1];
+    await addChain(l2, customToken);
+  }
+
+  async function getChains() {
+    const l1 = await getChain("l1");
+    const l2 = await getChain("l2");
+    setChains([l1, l2]);
+  }
+
+  async function getTokenDetails() {
+    const token = await getToken();
+    setCustomToken(token);
+  }
+
+  async function getDetails() {
+    await getTokenDetails();
+    await getChains();
+    setLoaded(true);
+  }
+
+  useEffect(() => {
+    getDetails();
+  }, []);
+
+  useEffect(() => {
+    if (window.ethereum) {
+      addL1Chain();
+      addL2Chain();
     }
-    
-    async function addL2Chain() {
-        const l2 = chains[1];
-        await addChain(l2, customToken);
-    }
-
-    async function getChains(){
-        const l1 = await getChain('l1');
-        const l2 = await getChain('l2');
-        setChains([l1, l2]);
-    }
-
-
-    async function getTokenDetails(){
-        const token = await getToken();
-        setCustomToken(token);
-    }
-
-    async function getDetails() {
-        await getTokenDetails();
-        await getChains();
-        setLoaded(true);
-    }
-
-    useEffect(()=>{
-        getDetails();
-    } , []);
-
-
-    useEffect(()=>{
-        if(window.ethereum){
-            addL1Chain();
-            addL2Chain();
-        }
-    }, [window.ethereum])
+  }, [window.ethereum]);
 
     return (
     <TokenContext.Provider value={customToken}>
@@ -95,7 +93,7 @@ function App() {
                 <RainbowKitProvider>
                     <Stack
                         sx={{
-                        background: 'url(/bg.svg)',
+                        background: mode === 'light' ? "#ffffff" : "black",
                         backgroundSize: 'cover',
                         height: '100vh',
                         flexGrow: 1
