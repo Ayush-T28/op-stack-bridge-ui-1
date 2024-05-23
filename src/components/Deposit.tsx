@@ -126,6 +126,7 @@ export default function Deposit({chains} : DepositProps){
             await switchChain(window.ethereum!, {id: chains[0].id});
         }
         setError(null);
+        await approveSpending();
         estimateGas();
         handleOpen();
     }
