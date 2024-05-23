@@ -62,6 +62,7 @@ export default function Activity({chains}: ActivityProps){
     
     async function getActivityDetails() {
         const details = await getAcitivity(transactionId);
+        console.log(details);
         setTransactionDetails(details);
     }
 

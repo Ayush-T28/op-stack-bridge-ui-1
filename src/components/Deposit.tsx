@@ -47,6 +47,7 @@ export default function Deposit({chains} : DepositProps){
 
     async function approveSpending() {
         const shouldApprove = allowance.data! < amount;
+        console.log({allowance: allowance.data!, amount, shouldApprove});
         if (shouldApprove) {
             const approvalTxHash = await approve()
             await l1PublicClient!.waitForTransactionReceipt({ hash: approvalTxHash })
