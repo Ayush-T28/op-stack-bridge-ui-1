@@ -76,13 +76,19 @@ export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chai
         hash: transaction_hash,
     });
 
+    console.log({receipt})
 
     const [withdrawal] = getWithdrawals(receipt);
+
+    console.log({withdrawal})
+
 
     const output = await l1Client.getL2Output({
         l2BlockNumber: receipt.blockNumber,
         targetChain: customL1Chain,
         })
+
+    console.log({output})
 
         
     const args = await l2Client.buildProveWithdrawal({
