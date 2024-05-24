@@ -16,7 +16,6 @@ import { getChain } from './api/chain';
 import { mainnet, optimism } from 'viem/chains';
 import { getToken } from './api/token';
 import { addChain } from './utils/metamask';
-import { rainbowTheme } from './theme';
 
 export const TokenContext = createContext({
     name: "",
