@@ -265,7 +265,7 @@ export default function Deposit({chains} : DepositProps){
                 <Balance rpc={chains[1].rpcUrls.default.http[0]} level="l2" />
             </Grid>
 
-            <Button  disabled={balance < amount} color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Deposit</Button>
+            <Button disabled={balance < amount || amount === BigInt(0)} color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Deposit</Button>
         </Stack>
         </>
     )

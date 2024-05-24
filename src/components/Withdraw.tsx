@@ -39,7 +39,7 @@ export default function Withdraw({chains}: WithdrawProps){
 
 
     async function fetchBalance() {
-        const balance = Number(await getBalance("l1", address!, token, chains[0].rpcUrls.default.http[0]))
+        const balance = Number(await getBalance("l2", address!, token, chains[1].rpcUrls.default.http[0]))
         setBalance(balance);
     }
 
@@ -239,7 +239,7 @@ export default function Withdraw({chains}: WithdrawProps){
                 <Balance rpc={chains[0].rpcUrls.default.http[0]} level="l1" />
             </Stack>
 
-            <Button color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Withdrawl</Button>
+            <Button disabled={balance < amount || amount === BigInt(0)} color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Withdrawl</Button>
         </Stack>
         </>
     )
