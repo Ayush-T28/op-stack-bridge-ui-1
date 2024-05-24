@@ -161,7 +161,7 @@ export default function Activity({chains}: ActivityProps){
     }
 
     useEffect(()=>{
-      getFinalizationTime(0);
+      getFinalizationTime();
     }, [error, transactionDetails, chains, isTxComplete]);
     
 

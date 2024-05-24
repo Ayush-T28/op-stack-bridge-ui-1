@@ -1,5 +1,5 @@
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import { Box, Button, Divider, IconButton, InputBase, LinearProgress, Modal, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, LinearProgress, Modal, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Chain } from "@rainbow-me/rainbowkit";
 import Balance from "./Balance";
 import { ContentCopy } from "@mui/icons-material";
@@ -14,7 +14,6 @@ import { addChain } from "../utils/metamask";
 import { switchChain } from "viem/actions";
 import { formatTime } from "../utils/date";
 import { getBalance } from "../utils/web3";
-import BN from 'bn.js';
 
 type WithdrawProps = {
     chains: Chain[],
