@@ -96,6 +96,7 @@ export default function Withdraw({chains}: WithdrawProps){
             // Subscribe to the transactionHash event
             txPromiEvent.on('transactionHash', (hash: string) => {
                 setTxHash(hash);
+                createWithdrawal(address?.toString() as string, 'withdrawal', 'initiate', amount.toString(), hash);
             });
 
 
@@ -109,7 +110,6 @@ export default function Withdraw({chains}: WithdrawProps){
                 if (confirmations.confirmations > 0) {
                     setRunningTx(false);
                     setIsTxComplete(true);
-                    createWithdrawal(address?.toString() as string, 'withdrawal', 'initiate', amount.toString(), confirmations.receipt.transactionHash);
                 }
             });
 
