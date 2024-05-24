@@ -87,7 +87,6 @@ export default function Activity({chains}: ActivityProps){
         }
         else{
             const initateTx = await getInitiateAcitivity(transactionDetails!.transaction_id);
-            console.log(initateTx);
             if(transactionDetails?.subtype === 'initiate'){
                 setIsRunning(true);
                 const [tx, err] = await prove(initateTx.transaction_hash as '0x${string}', chains[0], chains[1], chain!);
@@ -143,7 +142,6 @@ export default function Activity({chains}: ActivityProps){
             const timeSinceProof = getSecondsDifferenceFromNow(transactionDetails.created_at);
             const finalizationPeriod = chains[1].custom!.finalizationPeriod as number;
             let timeLeft = finalizationPeriod - timeSinceProof;
-            console.log({transactionDetails, timeLeft, timeSinceProof, finalizationPeriod})
             if(timeLeft < 0){
                 timeLeft = 0;
             }

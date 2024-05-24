@@ -61,16 +61,15 @@ export default function Deposit({chains} : DepositProps){
     const l1PublicClient = usePublicClient({ chainId: chains[0].id })
 
     async function approveSpending() {
-        console.log(allowance.data);
-        if(!allowance.data){
+        if(allowance.data === undefined){
             return;
         }
         const shouldApprove = BigInt(allowance.data) < amount;
-        console.log({shouldApprove, allowance: allowance.data, amount});
         if (shouldApprove) {
             const approvalTxHash = await approve()
             await l1PublicClient!.waitForTransactionReceipt({ hash: approvalTxHash })
         }
+        await estimateGas();
         await allowance.refetch();
     }
 
