@@ -82,9 +82,6 @@ export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chai
         l2BlockNumber: receipt.blockNumber,
         targetChain: customL1Chain,
     });
-
-    console.log({output})
-
         
     const args = await l2Client.buildProveWithdrawal({
         chain: l1,
@@ -151,23 +148,23 @@ export async function finalize(transaction_hash: '0x${string}', l1: Chain, l2: C
         transport: http(), 
     }).extend(publicActionsL2());
 
+    try{
     const receipt = await getTransactionReceipt(l2Client, {
         hash: transaction_hash,
-      })
-       
-      const [withdrawal] = getWithdrawals(receipt)
+    })
+    
+    const [withdrawal] = getWithdrawals(receipt)
 
-      try{
-            
-            const hash = await walletClientL1.finalizeWithdrawal({ 
-            account, 
-            targetChain: l2Client.chain, 
-            withdrawal, 
-            });
+        const hash = await walletClientL1.finalizeWithdrawal({ 
+        account, 
+        targetChain: l2Client.chain, 
+        withdrawal, 
+        });
 
-            return [hash, null];
-      }
-      catch(err: any){
-            return [null, err]
-      }
+        return [hash, null];
+    }
+    catch(err: any){
+        console.log(err);
+        return [null, err.message]
+    }
 }

@@ -78,11 +78,11 @@ function App() {
 
 
     useEffect(()=>{
-        if(window.ethereum){
+        if(window.ethereum && loaded){
             addL1Chain();
             addL2Chain();
         }
-    }, [window.ethereum])
+    }, [window.ethereum, loaded])
 
     return (
     <TokenContext.Provider value={customToken}>

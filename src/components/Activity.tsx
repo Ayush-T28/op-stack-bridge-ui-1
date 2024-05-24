@@ -86,7 +86,8 @@ export default function Activity({chains}: ActivityProps){
             window.open(`${chains[0].blockExplorers?.default.url}/tx/${transactionDetails?.transaction_hash}`, '_blank');
         }
         else{
-            const initateTx = await getInitiateAcitivity(transactionDetails!.id);
+            const initateTx = await getInitiateAcitivity(transactionDetails!.transaction_id);
+            console.log(initateTx);
             if(transactionDetails?.subtype === 'initiate'){
                 setIsRunning(true);
                 const [tx, err] = await prove(initateTx.transaction_hash as '0x${string}', chains[0], chains[1], chain!);
@@ -107,8 +108,9 @@ export default function Activity({chains}: ActivityProps){
                 }
                 
                 await updateWithdrawal(transactionDetails.id, 'prove', tx);
-                getTransactions();
-                getActivityDetails();
+                await getTransactions();
+                await getActivityDetails();
+                await getFinalizationTime();
             }
             else if(transactionDetails?.subtype === 'prove'){
                 setIsRunning(true);
@@ -132,7 +134,8 @@ export default function Activity({chains}: ActivityProps){
         }
     }
 
-    useEffect(()=>{
+
+    async function getFinalizationTime() {
         if(error.length > 0){
             setButtonDisabled(true);
         }
@@ -140,6 +143,7 @@ export default function Activity({chains}: ActivityProps){
             const timeSinceProof = getSecondsDifferenceFromNow(transactionDetails.created_at);
             const finalizationPeriod = chains[1].custom!.finalizationPeriod as number;
             let timeLeft = finalizationPeriod - timeSinceProof;
+            console.log({transactionDetails, timeLeft, timeSinceProof, finalizationPeriod})
             if(timeLeft < 0){
                 timeLeft = 0;
             }
@@ -154,7 +158,11 @@ export default function Activity({chains}: ActivityProps){
         else{
             setButtonDisabled(false);
         }
-    }, [error, transactionDetails, chains]);
+    }
+
+    useEffect(()=>{
+      getFinalizationTime(0);
+    }, [error, transactionDetails, chains, isTxComplete]);
     
 
     return (
@@ -174,6 +182,7 @@ export default function Activity({chains}: ActivityProps){
             border: '2px solid #000',
             boxShadow: 24,
             p: 4,
+            overflow: 'hidden'
             }}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                 Transaction Details
@@ -190,13 +199,13 @@ export default function Activity({chains}: ActivityProps){
                     <Typography noWrap>Transaction Hash: {transactionDetails?.transaction_hash}</Typography>
                     <ContentCopy fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} onClick={() => {navigator.clipboard.writeText(transactionDetails!.transaction_hash)}} titleAccess="Copy To Clipboard"/>
                 </Stack>
-                <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype}d</span></Typography>
+                <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype + 'd'}</span></Typography>
 
                 <Stack gap={1} marginTop={2}>
                     {isRunning && <LinearProgress variant='indeterminate' /> }
-                    {error.length > 0 && <Typography variant='body2' textAlign='center' color='red'>{error}</Typography>}
+                    {error.length > 0 && <Typography variant='caption' textAlign='center' color='red'>{error}</Typography>}
                     {error.length === 0 && buttonDisabled && <Typography variant='body2' textAlign='center' color='red'>Withdrawal can be finalized after {formatTime(timeUntilFinalize)}</Typography>}
-                    {isTxComplete && <Typography variant='caption' textAlign='center' color='green'>Transaction Sent</Typography>}
+                    {isTxComplete  && error.length === 0 && <Typography variant='caption' textAlign='center' color='green'>Transaction Sent</Typography>}
                     <Button disabled={buttonDisabled} color="secondary" variant='contained' sx={{padding: 1, width: '100%', borderRadius: 2}} onClick={() => handleButtonClick()}>
                         {type === 'deposit' ? 'View in explorer' : 
                         transactionDetails?.subtype === 'initiate' ? 'Prove Withdrawal' : 

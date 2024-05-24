@@ -1,5 +1,5 @@
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import { Box, Button, Divider, Grid, IconButton, InputBase, LinearProgress, Modal, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid, IconButton, Input, LinearProgress, Modal, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Chain } from "@rainbow-me/rainbowkit";
 import Balance from "./Balance";
 import { useERC20Allowance } from "../hooks/useERC20Allowance";
@@ -12,14 +12,18 @@ import Web3 from 'web3'
 import { ContentCopy } from "@mui/icons-material";
 import { createDeposit } from '../api/deposit';
 import { TokenContext } from "../App";
+import { getBalance } from "../utils/web3";
+import BN from 'bn.js';
 
 type DepositProps = {
     chains: Chain[],
 }
 
+
 export default function Deposit({chains} : DepositProps){
     const {address, chain} = useAccount();
-    const [amount, setAmount] = useState(0.0);
+    const [balance, setBalance] = useState(0);
+    const [amount, setAmount] = useState<bigint>(BigInt(0));
     const web3 = new Web3(window.ethereum)
 
     const [runningTx, setRunningTx] = useState(false);
@@ -42,11 +46,26 @@ export default function Deposit({chains} : DepositProps){
         owner: address as Address,
         spender: (chains[0].contracts!.optimismPortalProxy! as ChainContract).address,
     });
+
+
+    async function fetchBalance() {
+            const balance = Number(await getBalance("l1", address!, token, chains[0].rpcUrls.default.http[0]))
+            setBalance(balance);
+    }
+
+    useEffect(()=>{
+        if(address){
+            fetchBalance();
+        }
+    }, [address, amount, chains, token])
+
     const l1PublicClient = usePublicClient({ chainId: chains[0].id })
 
-
     async function approveSpending() {
-        const shouldApprove = allowance.data! < amount;
+        if(!allowance.data){
+            return;
+        }
+        const shouldApprove = BigInt(allowance.data) < amount;
         if (shouldApprove) {
             const approvalTxHash = await approve()
             await l1PublicClient!.waitForTransactionReceipt({ hash: approvalTxHash })
@@ -61,16 +80,16 @@ export default function Deposit({chains} : DepositProps){
             from: address,
         }
     
-        const gasLimit = await contract.methods.depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x',)
+        let gasLimit = await contract.methods.depositERC20Transaction(address?.toString(), amount, amount, 21000, false, '0x',)
             .estimateGas(functionArgs)
             .catch((error) => {
                 console.log("failed to estimate gas: ", error)
-                setError("Cannot estimate gas. Transaction will likely fail.");
+                // setError("Cannot estimate gas. Transaction will likely fail.");
         })
            
         if (!gasLimit) {
-            setGas(0);
-            return;
+            setGas(30000);
+            gasLimit = BigInt(30000);
         }
 
         const gasPrice = await web3.eth.getGasPrice();
@@ -125,7 +144,6 @@ export default function Deposit({chains} : DepositProps){
             await switchChain(window.ethereum!, {id: chains[0].id});
         }
         setError(null);
-        await approveSpending();
         estimateGas();
         handleOpen();
     }
@@ -176,7 +194,7 @@ export default function Deposit({chains} : DepositProps){
             <Divider sx={{marginTop: 3}}/>
             <Stack gap={1} paddingY={3}>
             <Typography variant='body2'>
-                You are sending: {Web3.utils.fromWei(amount, 'ether')} {token.symbol}
+                You are sending: {Web3.utils.fromWei(amount.toString(), 'ether')} {token.symbol}
             </Typography>
             <Typography variant='body2'>
                 Estimated Gas: {Web3.utils.fromWei(gas, 'ether')} ETH
@@ -201,7 +219,7 @@ export default function Deposit({chains} : DepositProps){
                 </Button>
                 </Stack>
             ) : <Button disabled={gas === 0} color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeDeposit}>{ runningTx ? 'Sending Deposit' : gas === 0 ? 'Estimating Gas' : 'Confirm Deposit' }</Button>}
-            {error && <Typography color='red' variant="caption" noWrap>There was an error : {error}</Typography>}
+            {error && <Typography color='red' variant="body2" noWrap>There was an error : {error}</Typography>}
             </Box>
         </Modal>
         <Stack gap={2} alignItems='center'> 
@@ -215,17 +233,18 @@ export default function Deposit({chains} : DepositProps){
 
             <Paper
             component="form"
-            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '100%' }}
+            sx={{ display: 'flex', alignItems: 'center', width: '100%' }}
             >
-                <InputBase
-                    sx={{ ml: 1, flex: 1 }}
+                <TextField
+                    sx={{ ml: 0, flex: 1, border: 'none' }}
                     placeholder="Amount"
-                    onChange={(e)=>{setAmount(parseFloat(Web3.utils.toWei(parseFloat(e.target.value || "0"), 'ether')))}}
+                    onChange={(e: any)=>{setAmount(BigInt(Web3.utils.toWei(e.target.value || "0", 'ether')))}}
                     inputProps={{ 'aria-label': 'search google maps' }}
                     defaultValue={0.00}
                     autoFocus
+                    error={balance < amount}
+                    variant='outlined'
                 />
-                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                 <IconButton color="primary" sx={{ padding: '10px' }} aria-label="directions">
                     <img src={token.iconUrl} height={35} />
                     <Typography marginLeft={1}>{token.symbol}</Typography>
@@ -242,7 +261,7 @@ export default function Deposit({chains} : DepositProps){
                 <Balance rpc={chains[1].rpcUrls.default.http[0]} level="l2" />
             </Grid>
 
-            <Button color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Deposit</Button>
+            <Button  disabled={balance < amount} color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Deposit</Button>
         </Stack>
         </>
     )

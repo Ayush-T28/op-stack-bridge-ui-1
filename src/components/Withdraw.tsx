@@ -1,5 +1,5 @@
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import { Box, Button, Divider, IconButton, InputBase, LinearProgress, Modal, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, InputBase, LinearProgress, Modal, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Chain } from "@rainbow-me/rainbowkit";
 import Balance from "./Balance";
 import { ContentCopy } from "@mui/icons-material";
@@ -13,6 +13,8 @@ import { createWithdrawal } from "../api/withdrawal";
 import { addChain } from "../utils/metamask";
 import { switchChain } from "viem/actions";
 import { formatTime } from "../utils/date";
+import { getBalance } from "../utils/web3";
+import BN from 'bn.js';
 
 type WithdrawProps = {
     chains: Chain[],
@@ -22,8 +24,9 @@ export default function Withdraw({chains}: WithdrawProps){
     const token = useContext(TokenContext);
     const web3 = new Web3(window.ethereum)
     const {address, chain} = useAccount();
+    const [balance, setBalance] = useState(0);
 
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState<bigint>(BigInt(0));
     const [gasLimit, setGasLimit] = useState(0);
     const [gas, setGas] = useState(0);
     const [txHash, setTxHash] = useState('');
@@ -35,6 +38,18 @@ export default function Withdraw({chains}: WithdrawProps){
     const handleClose = () => setOpen(false);
     const [error, setError] = useState<string | null>(null);
 
+
+    async function fetchBalance() {
+        const balance = Number(await getBalance("l1", address!, token, chains[0].rpcUrls.default.http[0]))
+        setBalance(balance);
+    }
+
+    useEffect(()=>{
+        if(address){
+            fetchBalance();
+        }
+    }, [address, amount, chains, token])
+
     async function estimateGas() {
         const contract = new web3.eth.Contract(l2ToL1MessagePasserProxyABI, (chains[1].contracts!.l2ToL1MessagePasserProxy as ChainContract).address)
     
@@ -43,18 +58,17 @@ export default function Withdraw({chains}: WithdrawProps){
             value : amount.toString(),
         }
     
-        const gasLimit = await contract.methods.initiateWithdrawal(address?.toString(), 21000, '0x',)
+        let gasLimit = await contract.methods.initiateWithdrawal(address?.toString(), 21000, '0x',)
             .estimateGas(functionArgs)
             .catch((error) => {
                 console.log("error estimating gas", error);
-                setError("Cannot estimate gas. Transaction will likely fail.");
+                // setError("Cannot estimate gas. Transaction will likely fail.");
         });
            
         if (!gasLimit) {
-            setGas(0);
-            return;
+            setGas(30000);
+            gasLimit = BigInt(30000);
         }
-
 
         const gasPrice = await web3.eth.getGasPrice();
         const gasCostWei = gasLimit * gasPrice;
@@ -84,7 +98,6 @@ export default function Withdraw({chains}: WithdrawProps){
             txPromiEvent.on('transactionHash', (hash: string) => {
                 setTxHash(hash);
                 setRunningTx(true);
-                createWithdrawal(address?.toString() as string, 'withdrawal', 'initiate', amount.toString(), hash);
             });
 
 
@@ -98,6 +111,7 @@ export default function Withdraw({chains}: WithdrawProps){
                 if (confirmations.confirmations > 0) {
                     setRunningTx(false);
                     setIsTxComplete(true);
+                    createWithdrawal(address?.toString() as string, 'withdrawal', 'initiate', amount.toString(), txHash);
                 }
             });
 
@@ -160,7 +174,7 @@ export default function Withdraw({chains}: WithdrawProps){
             <Divider sx={{marginTop: 3}}/>
             <Stack gap={1} paddingY={3}>
             <Typography variant='body2'>
-                You are withdrawing: {Web3.utils.fromWei(amount, 'ether')} {token.symbol}
+                You are withdrawing: {Web3.utils.fromWei(amount.toString(), 'ether')} {token.symbol}
             </Typography>
             <Typography variant='body2'>
                 Estimated Gas: {Web3.utils.fromWei(gas, 'ether')} {token.symbol}
@@ -200,17 +214,18 @@ export default function Withdraw({chains}: WithdrawProps){
 
             <Paper
             component="form"
-            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '100%' }}
+            sx={{ display: 'flex', alignItems: 'center', width: '100%' }}
             >
-                <InputBase
-                    sx={{ ml: 1, flex: 1 }}
+                <TextField
+                    sx={{ ml: 0, flex: 1, border: 'none' }}
                     placeholder="Amount"
-                    onChange={(e)=>{setAmount(parseFloat(Web3.utils.toWei(parseFloat(e.target.value || "0"), 'ether')))}}
+                    onChange={(e: any)=>{setAmount(BigInt(Web3.utils.toWei(e.target.value || "0", 'ether')))}}
                     inputProps={{ 'aria-label': 'search google maps' }}
                     defaultValue={0.00}
                     autoFocus
+                    error={balance < amount}
+                    variant='outlined'
                 />
-                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                 <IconButton color="primary" sx={{ padding: '10px' }} aria-label="directions">
                     <img src={token.iconUrl} height={35} />
                     <Typography marginLeft={1}>{token.symbol}</Typography>
