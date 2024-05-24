@@ -25,15 +25,15 @@ export async function getChain(level: "l1"|"l2"): Promise<Chain> {
             "optimismPortalProxy": {
                 address: data.optimismPortalProxy,
                 blockCreated: 0, // actual value doesnt matter
-            }
-        }
-    }
-    else{
-        chain.contracts = {
+            },
             "l2OutputOracle": {
                 address: data.l2OutputOracleProxy,
                 blockCreated: 0,
             },
+        }
+    }
+    else{
+        chain.contracts = {
             "l2ToL1MessagePasserProxy": {
                 address: data.l2ToL1MessagePasserProxy,
                 blockCreated: 0,

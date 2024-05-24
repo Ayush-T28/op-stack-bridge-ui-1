@@ -19,12 +19,12 @@ export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chai
         contracts: {
             portal: {
                 [l1.id]: {  // Dynamic key assignment
-                    address: '0xD0608c887Ac8B97C20a0fC6574b6Eb6e978f42cD'
+                    address: (l1.contracts!.optimismPortalProxy as any).address as any,
                 }
             },
             l2OutputOracle: {
                 [l1.id]: {  // Dynamic key assignment
-                    address: '0xc961e9814733bcaE318F85b23D5530376A0a4297'
+                    address: (l1.contracts!.l2OutputOracle as any).address as any,
                 }
             },
         },
@@ -40,12 +40,12 @@ export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chai
         contracts: {
             portal: {
                 [l1.id]: {  // Dynamic key assignment
-                    address: '0xD0608c887Ac8B97C20a0fC6574b6Eb6e978f42cD'
+                    address: (l1.contracts!.optimismPortalProxy as any).address as any,
                 }
             },
             l2OutputOracle: {
                 [l1.id]: {  // Dynamic key assignment
-                    address: '0xc961e9814733bcaE318F85b23D5530376A0a4297'
+                    address: (l1.contracts!.l2OutputOracle as any).address as any,
                 }
             },
         },
@@ -76,17 +76,12 @@ export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chai
         hash: transaction_hash,
     });
 
-    console.log({receipt})
-
     const [withdrawal] = getWithdrawals(receipt);
-
-    console.log({withdrawal})
-
 
     const output = await l1Client.getL2Output({
         l2BlockNumber: receipt.blockNumber,
         targetChain: customL1Chain,
-        })
+    });
 
     console.log({output})
 
@@ -129,12 +124,12 @@ export async function finalize(transaction_hash: '0x${string}', l1: Chain, l2: C
         contracts: {
             portal: {
                 [l1.id]: {  // Dynamic key assignment
-                    address: '0xD0608c887Ac8B97C20a0fC6574b6Eb6e978f42cD'
+                    address: (l1.contracts!.optimismPortalProxy as any).address as any,
                 }
             },
             l2OutputOracle: {
                 [l1.id]: {  // Dynamic key assignment
-                    address: '0xc961e9814733bcaE318F85b23D5530376A0a4297'
+                    address: (l1.contracts!.l2OutputOracle as any).address as any,
                 }
             },
         },
