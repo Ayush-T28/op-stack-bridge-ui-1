@@ -21,9 +21,10 @@ export default function Bridge({chains}: BridgeProps) {
         <Paper
             sx={{
             padding: 5,
-            margin: 10,
+            marginTop: 5,
             marginX: 'auto',
-            height: '90vh',
+            height: '70vh',
+            maxHeight: '70vh',
             width: '97%',
             backgroundColor: mode === 'light' ? "#f3f3f3" : '#171717',
             backdropFilter: 'blur(10px)',
