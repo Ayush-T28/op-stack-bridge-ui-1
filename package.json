@@ -21,6 +21,7 @@
     "axios": "^1.6.8",
     "bn.js": "^5.2.1",
     "localforage": "^1.10.0",
+    "lodash.merge": "^4.6.2",
     "match-sorter": "^6.3.4",
     "normalize.css": "^8.0.1",
     "react": "^18.2.0",
@@ -32,6 +33,7 @@
     "web3": "^4.8.0"
   },
   "devDependencies": {
+    "@types/lodash.merge": "^4.6.9",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
