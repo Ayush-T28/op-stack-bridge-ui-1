@@ -132,8 +132,9 @@ export default function Activity({chains}: ActivityProps){
                     setIsTxComplete(true);
                     setIsRunning(false);
                 }
-                await updateWithdrawal(transactionDetails.id, 'finalize', tx);
-                getTransactions();
+                await updateWithdrawal(transactionDetails.transaction_id, 'finalize', tx);
+                await getTransactions();
+                await getActivityDetails();
             }
             else{
                 window.open(`${chains[0].blockExplorers?.default.url}/tx/${transactionDetails?.transaction_hash}`, '_blank');
