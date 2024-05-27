@@ -96,16 +96,6 @@ export function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chain, cur
                 account,
                 output,
                 withdrawal: withdrawal,
-            })
-        
-            
-            const hash = await walletClientL1.proveWithdrawal({
-                account,
-                l2OutputIndex: output.outputIndex,
-                outputRootProof: args.outputRootProof,
-                withdrawalProof: args.withdrawalProof,
-                withdrawal,
-                targetChain: customL2Chain,
             });
         
             const web3 = new Web3(window.ethereum)
