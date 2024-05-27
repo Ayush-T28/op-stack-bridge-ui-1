@@ -69,12 +69,6 @@ export function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chain, cur
                 transport: http(), 
             }).extend(publicActionsL1());
         
-            const walletClientL1 = createWalletClient({
-                account,
-                chain: l1,
-                transport: custom(window.ethereum)
-            }).extend(walletActionsL1())
-        
             const l2Client = createPublicClient({ 
                 chain: customL2Chain, 
                 transport: http(), 
