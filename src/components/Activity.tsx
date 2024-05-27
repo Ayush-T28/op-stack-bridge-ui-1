@@ -126,6 +126,18 @@ export default function Activity({chains}: ActivityProps){
                     setIsRunning(false);
                     setError(err!);
                     setIsTxComplete(true);
+                    if(err.toString().includes('withdrawal has already been finalized')){
+                        // somehow the withdrawl is proven already
+                        // update withdrawl
+                        // since we dont know the proven tx, use a random tx id
+                        const web3 = new Web3();
+                        await updateWithdrawal(transactionDetails.transaction_id, 'finalize', web3.eth.accounts.create().address);
+                        await getTransactions();
+                        await getActivityDetails();
+                    }
+                    else{
+                        setError(err || "Unknown Error");
+                    }
                     return;
                 }
                 else {
