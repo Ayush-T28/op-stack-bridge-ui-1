@@ -96,6 +96,15 @@ export default function Activity({chains}: ActivityProps){
                     if(err.toString().includes('cannot get output for a block that has not been proposed')){
                         setError("Block not proposed yet. Try again in 30 mins");
                     }
+                    else if(err.toString().includes('withdrawal hash has already been proven')){
+                        // somehow the withdrawl is proven already
+                        // update withdrawl
+                        // since we dont know the proven tx, use a random tx id
+                        const web3 = new Web3();
+                        await updateWithdrawal(transactionDetails.id, 'prove', web3.eth.accounts.create().address);
+                        await getTransactions();
+                        await getActivityDetails();
+                    }
                     else{
                         setError(err || "Unknown Error");
                     }
