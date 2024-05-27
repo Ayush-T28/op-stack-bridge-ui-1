@@ -89,16 +89,8 @@ export default function Activity({chains}: ActivityProps){
             const initateTx = await getInitiateAcitivity(transactionDetails!.transaction_id);
             if(transactionDetails?.subtype === 'initiate'){
                 setIsRunning(true);
-                try{
-                const tx = await prove(initateTx.transaction_hash as '0x${string}', chains[0], chains[1], chain!, address as string);
-                setIsTxComplete(true);
-                setIsRunning(false);
-                await updateWithdrawal(transactionDetails.transaction_id, 'prove', tx);
-                await getTransactions();
-                await getActivityDetails();
-                await getFinalizationTime();
-                }
-                catch(err: any){
+                const [tx, err] = await prove(initateTx.transaction_hash as '0x${string}', chains[0], chains[1], chain!);
+                if(!tx){
                     setIsRunning(false);
                     setIsTxComplete(false);
                     if(err.toString().includes('cannot get output for a block that has not been proposed')){
@@ -118,7 +110,14 @@ export default function Activity({chains}: ActivityProps){
                     }
                     return;
                 }
-               
+                else {
+                    setIsTxComplete(true);
+                    setIsRunning(false);
+                }
+                await updateWithdrawal(transactionDetails.transaction_id, 'prove', tx);
+                await getTransactions();
+                await getActivityDetails();
+                await getFinalizationTime();
             }
             else if(transactionDetails?.subtype === 'prove'){
                 setIsRunning(true);
