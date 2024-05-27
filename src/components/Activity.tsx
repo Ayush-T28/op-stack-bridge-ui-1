@@ -105,7 +105,7 @@ export default function Activity({chains}: ActivityProps){
                     setIsTxComplete(true);
                     setIsRunning(false);
                 }
-                
+                console.log({tx, err});
                 await updateWithdrawal(transactionDetails.id, 'prove', tx);
                 await getTransactions();
                 await getActivityDetails();
