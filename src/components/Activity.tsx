@@ -124,7 +124,6 @@ export default function Activity({chains}: ActivityProps){
                 const [tx, err] = await finalize(initateTx.transaction_hash as '0x${string}', chains[0], chains[1], chain!);
                 if(!tx){
                     setIsRunning(false);
-                    setError(err!);
                     setIsTxComplete(true);
                     if(err.toString().includes('withdrawal has already been finalized')){
                         // somehow the withdrawl is proven already
