@@ -99,7 +99,7 @@ export function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chain, cur
         
             // Send the transaction and subscribe to the transactionHash event
             const proveWithdrawal = contract.methods
-            .proveWithdrawal(
+            .proveWithdrawalTransaction(
                 [
                     withdrawal.nonce,
                     withdrawal.sender,
