@@ -90,14 +90,14 @@ export default function Activity({chains}: ActivityProps){
             if(transactionDetails?.subtype === 'initiate'){
                 setIsRunning(true);
                 const [tx, err] = await prove(initateTx.transaction_hash as '0x${string}', chains[0], chains[1], chain!);
-                if(err){
+                if(!tx){
                     setIsRunning(false);
                     setIsTxComplete(false);
                     if(err.toString().includes('cannot get output for a block that has not been proposed')){
                         setError("Block not proposed yet. Try again in 30 mins");
                     }
                     else{
-                        setError(err);
+                        setError(err || "Unknown Error");
                     }
                     return;
                 }
