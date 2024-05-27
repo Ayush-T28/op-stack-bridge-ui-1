@@ -11,6 +11,8 @@ export async function createWithdrawal(
     account: string, type: 'withdrawal',
     subtype: 'initiate', amount: string, transactionHash: string
 ): Promise<ApiResponse> {
+
+    console.log({account, type, subtype, amount, transactionHash});
     const data = (await axiosBackendInstance.post(`/withdrawal`, {
         account, type, subtype, amount, transactionHash
     })).data;

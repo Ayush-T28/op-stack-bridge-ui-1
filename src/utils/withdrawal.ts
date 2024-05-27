@@ -102,7 +102,8 @@ export async function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chai
     return [hash, null];
     }
     catch(err: any){
-        return [null, err.cause]
+        console.log('error proving withdrawl: ' , err);
+        return [null, err]
     }
 }
 
@@ -152,16 +153,19 @@ export async function finalize(transaction_hash: '0x${string}', l1: Chain, l2: C
     const receipt = await getTransactionReceipt(l2Client, {
         hash: transaction_hash,
     })
+
+    console.log({receipt});
     
     const [withdrawal] = getWithdrawals(receipt)
 
-        const hash = await walletClientL1.finalizeWithdrawal({ 
-        account, 
-        targetChain: l2Client.chain, 
-        withdrawal, 
-        });
+    console.log({withdrawal});
 
-        return [hash, null];
+    const hash = await walletClientL1.finalizeWithdrawal({ 
+    account, 
+    targetChain: l2Client.chain, 
+    withdrawal, 
+    });
+    return [hash, null];
     }
     catch(err: any){
         console.log(err);
