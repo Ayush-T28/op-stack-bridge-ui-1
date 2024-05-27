@@ -134,6 +134,9 @@ export default function Activity({chains}: ActivityProps){
                         await getTransactions();
                         await getActivityDetails();
                     }
+                    else if(err.toString().includes('finalization period has not elapsed')){
+                        setError(`Transaction can be finalized in ${formatTime(chains[1].custom!.finalizationPeriod as number)} after proving`);
+                    }
                     else{
                         setError(err || "Unknown Error");
                     }
