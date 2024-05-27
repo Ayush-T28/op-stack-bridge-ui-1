@@ -153,12 +153,8 @@ export async function finalize(transaction_hash: '0x${string}', l1: Chain, l2: C
     const receipt = await getTransactionReceipt(l2Client, {
         hash: transaction_hash,
     })
-
-    console.log({receipt});
     
     const [withdrawal] = getWithdrawals(receipt)
-
-    console.log({withdrawal});
 
     const hash = await walletClientL1.finalizeWithdrawal({ 
     account, 

@@ -96,7 +96,6 @@ export default function Withdraw({chains}: WithdrawProps){
             // Subscribe to the transactionHash event
             txPromiEvent.on('transactionHash', (hash: string) => {
                 setTxHash(hash);
-                console.log({hash});
                 createWithdrawal(address?.toString() as string, 'withdrawal', 'initiate', amount.toString(), hash);
             });
 
