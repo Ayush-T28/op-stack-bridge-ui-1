@@ -92,7 +92,7 @@ export function prove(transaction_hash: '0x${string}', l1: Chain, l2: Chain, cur
                 withdrawal: withdrawal,
             });
         
-            const web3 = new Web3(window.ethereum)
+            const web3 = new Web3(l1Client);
         
             const contract = new web3.eth.Contract(optimismPortalProxyABI, (l1.contracts!.optimismPortalProxy as ChainContract).address)
         

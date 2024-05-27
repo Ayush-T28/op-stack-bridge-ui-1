@@ -93,7 +93,7 @@ export default function Activity({chains}: ActivityProps){
                 const tx = await prove(initateTx.transaction_hash as '0x${string}', chains[0], chains[1], chain!, address as string);
                 setIsTxComplete(true);
                 setIsRunning(false);
-                await updateWithdrawal(transactionDetails.id, 'prove', tx);
+                await updateWithdrawal(transactionDetails.transaction_id, 'prove', tx);
                 await getTransactions();
                 await getActivityDetails();
                 await getFinalizationTime();
@@ -109,7 +109,7 @@ export default function Activity({chains}: ActivityProps){
                         // update withdrawl
                         // since we dont know the proven tx, use a random tx id
                         const web3 = new Web3();
-                        await updateWithdrawal(transactionDetails.id, 'prove', web3.eth.accounts.create().address);
+                        await updateWithdrawal(transactionDetails.transaction_id, 'prove', web3.eth.accounts.create().address);
                         await getTransactions();
                         await getActivityDetails();
                     }
