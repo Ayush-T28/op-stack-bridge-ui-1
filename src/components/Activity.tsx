@@ -1,4 +1,4 @@
-import { ArrowDownward, ArrowRight, ArrowRightAlt, ArrowUpward, ContentCopy } from "@mui/icons-material"
+import { ArrowDownward, ArrowRight, ArrowRightAlt, ArrowUpward, ContentCopy, Done } from "@mui/icons-material"
 import { useAccount } from 'wagmi'
 import Web3 from 'web3'
 import { Paper, Tabs, Tab, Box, useColorScheme, Stack, Divider, Typography, Button, Modal, LinearProgress } from "@mui/material"
@@ -40,6 +40,17 @@ export default function Activity({chains}: ActivityProps){
     const [buttonDisabled, setButtonDisabled] = useState(false);
 
     const [timeUntilFinalize, setTimeUntilFinalize] = useState(0);
+
+
+    const [copyTickDisplayed, setCopyTickDisplayed] = useState(false);
+
+    useEffect(()=>{
+        if(copyTickDisplayed){
+            setTimeout(()=>{
+                setCopyTickDisplayed(false);
+            });
+        }
+    }, [copyTickDisplayed])
 
     async function getTransactions() {
         if (address) {
@@ -218,7 +229,10 @@ export default function Activity({chains}: ActivityProps){
                 <Typography>{type === 'deposit' ? 'Deposited' : 'Withdrew'} {transactionDetails?.amount ? Web3.utils.fromWei(transactionDetails?.amount , 'ether'): 0} ETH</Typography>
                 <Stack direction='row' alignItems='center' gap={1}>
                     <Typography noWrap>Transaction Hash: {transactionDetails?.transaction_hash}</Typography>
-                    <ContentCopy fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} onClick={() => {navigator.clipboard.writeText(transactionDetails!.transaction_hash)}} titleAccess="Copy To Clipboard"/>
+                    { !copyTickDisplayed ? 
+                    <ContentCopy fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} onClick={() => {navigator.clipboard.writeText(transactionDetails!.transaction_hash); setCopyTickDisplayed(true)}} titleAccess="Copy To Clipboard"/>
+                    : <Done fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} titleAccess="Copied"/>
+                    }
                 </Stack>
                 <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype + 'd'}</span></Typography>
 
@@ -311,7 +325,7 @@ export default function Activity({chains}: ActivityProps){
                                     <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(withdrawal.amount, 'ether')} ETH</Typography>
                                     <Typography variant="caption" textAlign='left'>{new Date(withdrawal.created_at).toString()}</Typography>
                                 </Stack>
-                                <Typography marginLeft='auto' variant='h6' color={withdrawal.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{withdrawal.subtype as string + 'd'}</span></Typography>
+                                <Typography marginLeft='auto' variant='h6' color={withdrawal.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{withdrawal.status as string + 'd'}</span></Typography>
                             </Stack>
                         </div>
                    </Stack>))}
