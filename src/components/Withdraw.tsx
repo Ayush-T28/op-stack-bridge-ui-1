@@ -128,7 +128,7 @@ export default function Withdraw({chains}: WithdrawProps){
 
     async function showReviewModal() {
         if(chain !== chains[1]){
-            await addChain(chains[1], token);
+            await addChain(chains[1]);
             await switchChain(window.ethereum!, {id: chains[1].id});
         }
         setError(null);

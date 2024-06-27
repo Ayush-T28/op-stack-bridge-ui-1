@@ -2,7 +2,7 @@ import { ArrowDownward, ArrowRight, ArrowRightAlt, ArrowUpward, ContentCopy, Don
 import { useAccount } from 'wagmi'
 import Web3 from 'web3'
 import { Paper, Tabs, Tab, Box, useColorScheme, Stack, Divider, Typography, Button, Modal, LinearProgress } from "@mui/material"
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getDeposits } from "../api/deposit";
 import { Activity as ActivityType, DepositQuery, WithdrawalQuery } from "../types";
 import { getWithdrawals, updateWithdrawal } from "../api/withdrawal";
@@ -10,6 +10,7 @@ import { Chain } from "@rainbow-me/rainbowkit";
 import { getAcitivity, getInitiateAcitivity } from "../api/activity";
 import { formatTime, formatTimestamp, getSecondsDifferenceFromNow } from "../utils/date";
 import { finalize, prove } from "../utils/withdrawal";
+import { TokenContext } from "../App";
   
 type ActivityProps = {
     chains: Chain[],
@@ -18,6 +19,8 @@ type DepositQueryAndStatus= DepositQuery & { status: string, subtype: string}
 type WithdrawalQueryAndStatus= WithdrawalQuery & { status: string, subtype: string}
 
 export default function Activity({chains}: ActivityProps){
+    const token = useContext(TokenContext);
+
     const { address, chain } = useAccount();
     const [value, setValue] = useState("deposits" as "deposits" | "withdrawals");
     const { mode } = useColorScheme();
@@ -226,7 +229,7 @@ export default function Activity({chains}: ActivityProps){
                     <ArrowRightAlt />
                     <img src={chains[type === 'deposit' ? 1 : 0].iconUrl as string} height={35} />
                 </Stack>
-                <Typography>{type === 'deposit' ? 'Deposited' : 'Withdrew'} {transactionDetails?.amount ? Web3.utils.fromWei(transactionDetails?.amount , 'ether'): 0} ETH</Typography>
+                <Typography>{type === 'deposit' ? 'Deposited' : 'Withdrew'} {transactionDetails?.amount ? Web3.utils.fromWei(transactionDetails?.amount , 'ether'): 0} {token.symbol}</Typography>
                 <Stack direction='row' alignItems='center' gap={1}>
                     <Typography noWrap>Transaction Hash: {transactionDetails?.transaction_hash}</Typography>
                     { !copyTickDisplayed ? 
@@ -296,7 +299,7 @@ export default function Activity({chains}: ActivityProps){
                             <img src={chains[1].iconUrl as string} height={50}/>
                             <Divider orientation='vertical' />
                             <Stack p={2}>
-                                <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(parseFloat(deposit.amount), 'ether')} ETH</Typography>
+                                <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(parseFloat(deposit.amount), 'ether')} {token.symbol}</Typography>
                                 <Typography variant="caption" textAlign='left'>{new Date(deposit.created_at).toString()}</Typography>
                             </Stack>
                             <Typography marginLeft='auto' variant='h6' color={deposit.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{deposit.subtype as string  + 'd'}</span></Typography>
@@ -322,7 +325,7 @@ export default function Activity({chains}: ActivityProps){
                                 <img src={chains[0].iconUrl as string} height={50}/>
                                 <Divider orientation='vertical' />
                                 <Stack p={2}>
-                                    <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(withdrawal.amount, 'ether')} ETH</Typography>
+                                    <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(withdrawal.amount, 'ether')} {token.symbol}</Typography>
                                     <Typography variant="caption" textAlign='left'>{new Date(withdrawal.created_at).toString()}</Typography>
                                 </Stack>
                                 <Typography marginLeft='auto' variant='h6' color={withdrawal.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{withdrawal.subtype as string + 'd'}</span></Typography>

@@ -47,12 +47,12 @@ function App() {
 
   async function addL1Chain() {
     const l1 = chains[0];
-    await addChain(l1, customToken);
+    await addChain(l1);
   }
 
   async function addL2Chain() {
     const l2 = chains[1];
-    await addChain(l2, customToken);
+    await addChain(l2);
   }
 
   async function getChains() {
@@ -121,7 +121,7 @@ function App() {
           </QueryClientProvider>
       </WagmiProvider>}
       </BrowserRouter>
-  </TokenContext.Provider>
+  </TokenContext.Provider> 
   );
 }
 
