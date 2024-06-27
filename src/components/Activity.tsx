@@ -48,7 +48,7 @@ export default function Activity({chains}: ActivityProps){
         if(copyTickDisplayed){
             setTimeout(()=>{
                 setCopyTickDisplayed(false);
-            },  );
+            }, 1000 );
         }
     }, [copyTickDisplayed])
 
