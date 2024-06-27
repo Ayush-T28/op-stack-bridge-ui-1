@@ -140,7 +140,7 @@ export default function Deposit({chains} : DepositProps){
 
 
     async function showReviewModal() {
-        if(chain !== chains[0]){
+        if(chain !== chains[0] && window.ethereum){
             await switchChain(window.ethereum!, {id: chains[0].id});
         }
         setError(null);
