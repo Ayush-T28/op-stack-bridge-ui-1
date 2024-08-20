@@ -46,6 +46,8 @@ export default function Activity({chains}: ActivityProps){
 
 
     const [copyTickDisplayed, setCopyTickDisplayed] = useState(false);
+    
+    const extendByHours=2; //to update date for proving 1,1.5,2
 
     useEffect(()=>{
         if(copyTickDisplayed){
@@ -199,7 +201,52 @@ export default function Activity({chains}: ActivityProps){
       getFinalizationTime();
     }, [error, transactionDetails, chains, isTxComplete]);
     
-
+    const getwithdrawstatus=(status:string,subtype:string)=>{
+        if (status==='fail'||status==='failed'){
+            return 'failed';
+        }
+        switch (subtype) {
+            case "prove":return "proved";
+            case "initiate":return "initiated";
+            case "finalize":return "finalized";
+            case "failed":return "failed";
+            case "fail":return "failed";
+                
+        
+            default:
+                return 'initiated';
+        }
+    }
+    function showProvingAlert(data:ActivityType|undefined){
+        if(!data){
+            return false;
+        }
+        if(data?.status === 'pending' && data?.subtype === 'initiate'){
+         return true;
+        } 
+        if(data?.status === 'completed' && data?.subtype === 'initiate'){
+         return true;
+        }
+        return false;
+    }
+    function addHoursToDate(dateString: string, hours: number): string {
+        // Parse the date string into a Date object
+        const date = new Date(dateString);
+     
+        // Check if the date is invalid
+        if (isNaN(date.getTime())) {
+            throw new Error("Invalid date string");
+        }
+     
+        // Create a new Date object to avoid mutating the original date
+        const newDate = new Date(date);
+     
+        // Add the hours to the new Date object
+        newDate.setHours(newDate.getHours() + hours);
+     
+        // Format the new date as a string (e.g., ISO format)
+        return formatTimestamp( newDate.toISOString()); // You can format it differently if needed
+    }
     return (
     <>
         <Modal
@@ -238,7 +285,10 @@ export default function Activity({chains}: ActivityProps){
                     }
                 </Stack>
                 <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype + 'd'}</span></Typography>
-
+                    <Typography> 
+                    {transactionDetails && showProvingAlert(transactionDetails) && <Typography variant='body2' textAlign='center' color='red'>Proving can be done after {addHoursToDate(transactionDetails?.created_at,extendByHours)}</Typography>}
+                    </Typography>
+                                  
                 <Stack gap={1} marginTop={2}>
                     {isRunning && <LinearProgress variant='indeterminate' /> }
                     {error.length > 0 && <Typography variant='caption' textAlign='center' color='red'>{error}</Typography>}
@@ -302,7 +352,7 @@ export default function Activity({chains}: ActivityProps){
                                 <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(parseFloat(deposit.amount), 'ether')} {token.symbol}</Typography>
                                 <Typography variant="caption" textAlign='left'>{new Date(deposit.created_at).toString()}</Typography>
                             </Stack>
-                            <Typography marginLeft='auto' variant='h6' color={deposit.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{deposit.subtype as string  + 'd'}</span></Typography>
+                            <Typography marginLeft='auto' variant='h6' color={deposit.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{deposit.status as string }</span></Typography>
                         </Stack>
                         </div>
                    </Stack>)) : withdrawals.sort((a, b) => {
@@ -328,7 +378,7 @@ export default function Activity({chains}: ActivityProps){
                                     <Typography variant='h5' textAlign='left'>{Web3.utils.fromWei(withdrawal.amount, 'ether')} {token.symbol}</Typography>
                                     <Typography variant="caption" textAlign='left'>{new Date(withdrawal.created_at).toString()}</Typography>
                                 </Stack>
-                                <Typography marginLeft='auto' variant='h6' color={withdrawal.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{withdrawal.subtype as string + 'd'}</span></Typography>
+                                <Typography marginLeft='auto' variant='h6' color={withdrawal.status === 'failed' ? 'red' : 'green'}><span style={{textTransform: 'capitalize'}}>{getwithdrawstatus(withdrawal.status,withdrawal.subtype)}</span></Typography>
                             </Stack>
                         </div>
                    </Stack>))}

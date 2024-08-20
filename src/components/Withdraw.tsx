@@ -164,7 +164,7 @@ export default function Withdraw({chains}: WithdrawProps){
         p: 4,
         }}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
-            Review Withdrawl
+            Review Withdrawal
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Please make sure the following details are correct before proceeding
@@ -196,7 +196,7 @@ export default function Withdraw({chains}: WithdrawProps){
                     View Transaction
                 </Button>
                 </Stack>
-            ) : <Button disabled={gas === 0} color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeWithdrawl}>{ runningTx ? 'Initating Withdrawl' : gas === 0 ? 'Estimating Gas' : 'Initiate Withdrawl' }</Button>}
+            ) : <Button disabled={gas === 0} color="secondary" variant='contained' sx={{padding: 1, width: '100%', marginTop: 2, borderRadius: 2}} onClick={executeWithdrawl}>{ runningTx ? 'Initating Withdrawal' : gas === 0 ? 'Estimating Gas' : 'Initiate Withdrawal' }</Button>}
             {error && <Typography color='red' variant="caption" noWrap>There was an error : {error}</Typography>}
             </Box>
         </Modal>
@@ -239,7 +239,7 @@ export default function Withdraw({chains}: WithdrawProps){
                 <Balance rpc={chains[0].rpcUrls.default.http[0]} level="l1" />
             </Stack>
 
-            <Button disabled={balance < amount || amount === BigInt(0)} color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Withdrawl</Button>
+            <Button disabled={balance < amount || amount === BigInt(0)} color="secondary" variant='contained' sx={{padding: 2, width: '75%', marginTop: 8, borderRadius: 2}} onClick={showReviewModal}>Review Withdrawal</Button>
         </Stack>
         </>
     )
