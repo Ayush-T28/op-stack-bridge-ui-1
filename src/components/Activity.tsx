@@ -287,8 +287,7 @@ export default function Activity({chains}: ActivityProps){
                 <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype + 'd'}</span></Typography>
                 {type === 'withdrawl' && <Typography> 
                     {transactionDetails && showProvingAlert(transactionDetails) && <Typography variant='body2' textAlign='center' color='red'>Proving can be done after {addHoursToDate(transactionDetails?.created_at,extendByHours)}</Typography>}
-</Typography>}
-                                  
+                </Typography>}                  
                 <Stack gap={1} marginTop={2}>
                     {isRunning && <LinearProgress variant='indeterminate' /> }
                     {error.length > 0 && <Typography variant='caption' textAlign='center' color='red'>{error}</Typography>}
