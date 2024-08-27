@@ -88,8 +88,8 @@ export default function Deposit({chains} : DepositProps){
         })
            
         if (!gasLimit) {
-            setGas(30000);
-            gasLimit = BigInt(30000);
+            setGas(300000);
+            gasLimit = BigInt(300000);
         }
 
         const gasPrice = await web3.eth.getGasPrice();
@@ -150,6 +150,7 @@ export default function Deposit({chains} : DepositProps){
 
     async function executeDeposit() {
         await approveSpending();
+        await estimateGas();
         await callDeposit();
     }
 
