@@ -284,7 +284,7 @@ export default function Activity({chains}: ActivityProps){
                     : <Done fontSize='small' sx={{marginLeft: 'auto', cursor: 'pointer'}} titleAccess="Copied"/>
                     }
                 </Stack>
-                <Typography>Status: <span style={{textTransform: 'capitalize'}}>{transactionDetails?.subtype + 'd'}</span></Typography>
+                <Typography>Status: <span style={{textTransform: 'capitalize'}}>{(transactionDetails?.subtype || 'initiate') + 'd'}</span></Typography>
                 {type === 'withdrawl' && <Typography> 
                     {transactionDetails && showProvingAlert(transactionDetails) && <Typography variant='body2' textAlign='center' color='red'>Proving can be done after {addHoursToDate(transactionDetails?.created_at,extendByHours)}</Typography>}
                 </Typography>}                  
