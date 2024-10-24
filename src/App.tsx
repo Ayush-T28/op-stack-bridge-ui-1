@@ -36,6 +36,14 @@ function App() {
         iconUrl: ""
     });
 
+    useEffect(() => {
+      document.title = import.meta.env.VITE_APP_TITLE || 'Bridge';
+      const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+      if (favicon) {
+        favicon.href = import.meta.env.VITE_APP_FAVICON || '/logo.svg';
+      }
+    }, []);
+
   const config = getDefaultConfig({
     appName: "Optimism Bridge",
     projectId: "62707a90c9737f0d7d60d8ec06a8b45a",
