@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Divider,
-  Grid,
   IconButton,
   LinearProgress,
   Modal,
@@ -224,31 +223,60 @@ export default function Deposit({ chains }: DepositProps) {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: { xs: "90%", sm: 400 }, // Adjust width for small screens
             bgcolor: "background.paper",
             border: "2px solid #000",
             boxShadow: 24,
             p: 4,
           }}
         >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{
+              fontSize: { xs: "1rem", sm: "1.25rem" }, // Responsive font size
+            }}
+          >
             Review Deposit
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          <Typography
+            id="modal-modal-description"
+            sx={{
+              mt: 2,
+              fontSize: { xs: "0.875rem", sm: "1rem" }, // Responsive font size
+            }}
+          >
             Please make sure the following details are correct before proceeding
           </Typography>
           <Divider sx={{ marginTop: 3 }} />
           <Stack gap={1} paddingY={3}>
-            <Typography variant="body2">
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: { xs: "0.75rem", sm: "1rem" }, // Responsive font size
+              }}
+            >
               You are sending: {Web3.utils.fromWei(amount.toString(), "ether")}{" "}
-              {token.symbol}
+              {token?.symbol}
             </Typography>
-            <Typography variant="body2">
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: { xs: "0.75rem", sm: "1rem" }, // Responsive font size
+              }}
+            >
               Estimated Gas: {Web3.utils.fromWei(gas, "ether")} ETH
             </Typography>
             {txHash && (
               <Stack direction="row" alignItems="center" gap={1}>
-                <Typography variant="body2" noWrap>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: { xs: "0.75rem", sm: "1rem" }, // Responsive font size
+                  }}
+                  noWrap
+                >
                   Transaction Hash: {txHash}
                 </Typography>
                 <ContentCopy
@@ -262,12 +290,26 @@ export default function Deposit({ chains }: DepositProps) {
               </Stack>
             )}
           </Stack>
-          <Typography variant="caption">Time to transfer: ~1 minute</Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: { xs: "0.625rem", sm: "0.75rem" }, // Responsive font size
+            }}
+          >
+            Time to transfer: ~1 minute
+          </Typography>
           {txHash && !error ? (
             <Stack gap={1} marginTop={2}>
               {runningTx && <LinearProgress variant="indeterminate" />}
               {isTxComplete && (
-                <Typography variant="caption" textAlign="center" color="green">
+                <Typography
+                  variant="caption"
+                  textAlign="center"
+                  color="green"
+                  sx={{
+                    fontSize: { xs: "0.625rem", sm: "0.75rem" }, // Responsive font size
+                  }}
+                >
                   Transaction Complete
                 </Typography>
               )}
@@ -286,7 +328,13 @@ export default function Deposit({ chains }: DepositProps) {
               disabled={gas === 0}
               color="secondary"
               variant="contained"
-              sx={{ padding: 1, width: "100%", marginTop: 2, borderRadius: 2 }}
+              sx={{
+                padding: 1,
+                width: "100%",
+                marginTop: 2,
+                borderRadius: 2,
+                fontSize: { xs: "0.75rem", sm: "1rem" }, // Responsive font size
+              }}
               onClick={executeDeposit}
             >
               {runningTx
@@ -297,30 +345,58 @@ export default function Deposit({ chains }: DepositProps) {
             </Button>
           )}
           {error && (
-            <Typography color="red" variant="body2" noWrap>
-              There was an error : {error}
+            <Typography
+              color="red"
+              variant="body2"
+              noWrap
+              sx={{
+                fontSize: { xs: "0.75rem", sm: "1rem" }, // Responsive font size
+              }}
+            >
+              There was an error: {error}
             </Typography>
           )}
         </Box>
       </Modal>
       <Stack gap={2} alignItems="center">
-        <Grid container width="100%" alignItems="center" gap={2}>
-          <Typography variant="h5" color="InactiveCaptionText">
-            From{" "}
+        <Stack direction="row" alignItems="center" gap={2} width="100%">
+          <Typography
+            variant="h5"
+            color="InactiveCaptionText"
+            sx={{
+              fontSize: { xs: "1rem", sm: "1.25rem" }, // Responsive font size
+            }}
+          >
+            From
           </Typography>
           <img
             src={chains[0].iconUrl?.toString()}
             height={35}
             alt="Ethereum logo"
           />
-          <Typography variant="h5">{chains[0].name}</Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              fontSize: { xs: "1rem", sm: "1.25rem" }, // Responsive font size
+            }}
+          >
+            {chains[0].name}
+          </Typography>
 
-          <Balance rpc={chains[0].rpcUrls.default.http[0]} level="l1" />
-        </Grid>
+          <Balance
+            rpc={chains[0].rpcUrls.default.http[0]}
+            level="l1"
+          />
+        </Stack>
 
         <Paper
           component="form"
-          sx={{ display: "flex", alignItems: "center", width: "100%" }}
+          elevation={2}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+          }}
         >
           <TextField
             sx={{ ml: 0, flex: 1, border: "none" }}
@@ -335,38 +411,61 @@ export default function Deposit({ chains }: DepositProps) {
             autoFocus
             error={balance < amount}
             variant="outlined"
+            style={{ height: "2 rem" }}
           />
           <IconButton
             color="primary"
             sx={{ padding: "10px" }}
             aria-label="directions"
           >
-            <img src={token.iconUrl} height={35} />
+            <img src={token.iconUrl} height={30} width={30} />
             <Typography marginLeft={1}>{token.symbol}</Typography>
           </IconButton>
         </Paper>
 
         <ArrowDownward fontSize="large" color="secondary" />
 
-        <Grid container width="100%" alignItems="center" gap={2}>
-          <Typography variant="h5" color="InactiveCaptionText">
-            To{" "}
+        <Stack direction="row" alignItems="center" gap={2} width="100%">
+          <Typography
+            variant="h5"
+            color="InactiveCaptionText"
+            sx={{
+              fontSize: { xs: "1rem", sm: "1.25rem" }, // Responsive font size
+            }}
+          >
+            To
           </Typography>
           <img
             src={chains[1].iconUrl?.toString()}
             height={35}
             alt="Ethereum logo"
           />
-          <Typography variant="h5">{chains[1].name}</Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              fontSize: { xs: "1rem", sm: "1.25rem" }, // Responsive font size
+            }}
+          >
+            {chains[1].name}
+          </Typography>
 
-          <Balance rpc={chains[1].rpcUrls.default.http[0]} level="l2" />
-        </Grid>
+          <Balance
+            rpc={chains[1].rpcUrls.default.http[0]}
+            level="l2"
+          />
+        </Stack>
 
         <Button
           disabled={balance < amount || amount === BigInt(0)}
           color="secondary"
           variant="contained"
-          sx={{ padding: 2, width: "75%", marginTop: 8, borderRadius: 2 }}
+          sx={{
+            padding: 2,
+            width: "75%",
+            marginTop: 8,
+            borderRadius: 2,
+            fontSize: { xs: "0.75rem", sm: "1rem" }, // Responsive font size
+          }}
           onClick={showReviewModal}
         >
           Review Deposit
