@@ -180,31 +180,53 @@ export default function Withdraw({ chains }: WithdrawProps) {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: "100%",
+            maxWidth: 400,
             bgcolor: "background.paper",
             border: "2px solid #000",
             boxShadow: 24,
             p: 4,
           }}
         >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }}
+          >
             Review Withdrawal
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          <Typography
+            id="modal-modal-description"
+            sx={{
+              mt: 2,
+              fontSize: { xs: "0.875rem", sm: "1rem" },
+            }}
+          >
             Please make sure the following details are correct before proceeding
           </Typography>
           <Divider sx={{ marginTop: 3 }} />
           <Stack gap={1} paddingY={3}>
-            <Typography variant="body2">
+            <Typography
+              variant="body2"
+              sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+            >
               You are withdrawing:{" "}
-              {Web3.utils.fromWei(amount.toString(), "ether")} {token.symbol}
+              {Web3.utils.fromWei(amount.toString(), "ether")} {token?.symbol}
             </Typography>
-            <Typography variant="body2">
-              Estimated Gas: {Web3.utils.fromWei(gas, "ether")} {token.symbol}
+            <Typography
+              variant="body2"
+              sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+            >
+              Estimated Gas: {Web3.utils.fromWei(gas, "ether")} {token?.symbol}
             </Typography>
             {txHash && (
               <Stack direction="row" alignItems="center" gap={1}>
-                <Typography variant="body2" noWrap>
+                <Typography
+                  variant="body2"
+                  noWrap
+                  sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                >
                   Transaction Hash: {txHash}
                 </Typography>
                 <ContentCopy
@@ -218,7 +240,10 @@ export default function Withdraw({ chains }: WithdrawProps) {
               </Stack>
             )}
           </Stack>
-          <Typography variant="caption">
+          <Typography
+            variant="caption"
+            sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+          >
             Time to transfer: ~
             {formatTime(chains[1].custom!.finalizationPeriod as number)}
           </Typography>
@@ -226,7 +251,12 @@ export default function Withdraw({ chains }: WithdrawProps) {
             <Stack gap={1} marginTop={2}>
               {runningTx && <LinearProgress variant="indeterminate" />}
               {isTxComplete && (
-                <Typography variant="caption" textAlign="center" color="green">
+                <Typography
+                  variant="caption"
+                  textAlign="center"
+                  color="green"
+                  sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                >
                   Transaction Complete
                 </Typography>
               )}
@@ -235,7 +265,12 @@ export default function Withdraw({ chains }: WithdrawProps) {
                 href={`${chains[1].blockExplorers?.default.url}/tx/${txHash}`}
                 target="_blank"
                 variant="contained"
-                sx={{ padding: 1, width: "100%", borderRadius: 2 }}
+                sx={{
+                  padding: 1,
+                  width: "100%",
+                  borderRadius: 2,
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                }}
               >
                 View Transaction
               </Button>
@@ -245,26 +280,42 @@ export default function Withdraw({ chains }: WithdrawProps) {
               disabled={gas === 0}
               color="secondary"
               variant="contained"
-              sx={{ padding: 1, width: "100%", marginTop: 2, borderRadius: 2 }}
+              sx={{
+                padding: 1,
+                width: "100%",
+                marginTop: 2,
+                borderRadius: 2,
+                fontSize: { xs: "0.875rem", sm: "1rem" },
+              }}
               onClick={executeWithdrawl}
             >
               {runningTx
-                ? "Initating Withdrawal"
+                ? "Initiating Withdrawal"
                 : gas === 0
                 ? "Estimating Gas"
                 : "Initiate Withdrawal"}
             </Button>
           )}
           {error && (
-            <Typography color="red" variant="caption" noWrap>
-              There was an error : {error}
+            <Typography
+              color="red"
+              variant="caption"
+              noWrap
+              sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+            >
+              There was an error: {error}
             </Typography>
           )}
         </Box>
       </Modal>
+
       <Stack gap={2} alignItems="center">
         <Stack direction="row" alignItems="center" gap={2} width="100%">
-          <Typography variant="h5" color="InactiveCaptionText">
+          <Typography
+            variant="h5"
+            color="InactiveCaptionText"
+            sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+          >
             From{" "}
           </Typography>
           <img
@@ -272,17 +323,35 @@ export default function Withdraw({ chains }: WithdrawProps) {
             height={35}
             alt="Ethereum logo"
           />
-          <Typography variant="h5">{chains[1].name}</Typography>
+          <Typography
+            variant="h5"
+            sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+          >
+            {chains[1].name}
+          </Typography>
 
-          <Balance rpc={chains[1].rpcUrls.default.http[0]} level="l2" />
+          <Balance
+            rpc={chains[1].rpcUrls.default.http[0]}
+            level="l2"
+          />
         </Stack>
 
         <Paper
           component="form"
-          sx={{ display: "flex", alignItems: "center", width: "100%" }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            padding: { xs: 1, sm: 2 },
+          }}
         >
           <TextField
-            sx={{ ml: 0, flex: 1, border: "none" }}
+            sx={{
+              ml: 0,
+              flex: 1,
+              border: "none",
+              fontSize: { xs: "0.875rem", sm: "1rem" },
+            }}
             placeholder="Amount"
             onChange={(e: any) => {
               setAmount(
@@ -304,10 +373,15 @@ export default function Withdraw({ chains }: WithdrawProps) {
             <Typography marginLeft={1}>{token.symbol}</Typography>
           </IconButton>
         </Paper>
+
         <ArrowDownward fontSize="large" color="secondary" />
 
         <Stack direction="row" alignItems="center" gap={2} width="100%">
-          <Typography variant="h5" color="InactiveCaptionText">
+          <Typography
+            variant="h5"
+            color="InactiveCaptionText"
+            sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+          >
             To{" "}
           </Typography>
           <img
@@ -315,16 +389,30 @@ export default function Withdraw({ chains }: WithdrawProps) {
             height={35}
             alt="Ethereum logo"
           />
-          <Typography variant="h5">{chains[0].name}</Typography>
+          <Typography
+            variant="h5"
+            sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+          >
+            {chains[0].name}
+          </Typography>
 
-          <Balance rpc={chains[0].rpcUrls.default.http[0]} level="l1" />
+          <Balance
+            rpc={chains[0].rpcUrls.default.http[0]}
+            level="l1"
+          />
         </Stack>
 
         <Button
           disabled={balance < amount || amount === BigInt(0)}
           color="secondary"
           variant="contained"
-          sx={{ padding: 2, width: "75%", marginTop: 8, borderRadius: 2 }}
+          sx={{
+            padding: 2,
+            width: "75%",
+            marginTop: 8,
+            borderRadius: 2,
+            fontSize: { xs: "0.875rem", sm: "1rem" },
+          }}
           onClick={showReviewModal}
         >
           Review Withdrawal

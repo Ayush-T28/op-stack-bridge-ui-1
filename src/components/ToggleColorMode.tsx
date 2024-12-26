@@ -1,4 +1,4 @@
-import { PaletteMode } from "@mui/material";
+import { PaletteMode, useMediaQuery, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 
@@ -11,16 +11,19 @@ interface ToggleColorModeProps {
 }
 
 function ToggleColorMode({ mode, toggleColorMode }: ToggleColorModeProps) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
-    <Box sx={{ maxWidth: "32px", marginRight: 2 }}>
+    <Box sx={{ maxWidth: '32px', marginRight: isSmallScreen ? 1 : 2}}>
       <Button
         variant="text"
         onClick={toggleColorMode}
         size="small"
         aria-label="button to toggle theme"
-        sx={{ minWidth: "32px", height: "32px", p: "4px" }}
+        sx={{ minWidth: '32px', height: '32px', p: '4px' }}
       >
-        {mode === "dark" ? (
+        {mode === 'dark' ? (
           <WbSunnyRoundedIcon fontSize="small" />
         ) : (
           <ModeNightRoundedIcon fontSize="small" />
