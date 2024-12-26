@@ -1,6 +1,8 @@
 import { Stack, Typography, useColorScheme } from "@mui/material";
+import getConfig from "../config.ts";
 
 const Footer = () => {
+  const config = getConfig;
   const { mode } = useColorScheme();
 
   return (
@@ -15,13 +17,17 @@ const Footer = () => {
         width: "100%",
       }}
     >
-      <img src="/optimism.png" height="50px" alt="Zeeve Logo" />
+      <img
+        src={config.brand.favicon || "/optimism.svg"}
+        height="50px"
+        alt={`${config.brand.name} Logo`}
+      />
       <Typography
         color={mode === "light" ? "black" : "white"}
         letterSpacing={1}
         ml={2}
       >
-        Powered by Zeeve
+        Powered by {`${config.brand.name || "Zeeve"}`}
       </Typography>
     </Stack>
   );

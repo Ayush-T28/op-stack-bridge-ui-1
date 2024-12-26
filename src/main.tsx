@@ -20,20 +20,20 @@ const theme = extendTheme({
     light: {
       palette: {
         primary: {
-          main: "#afac88",
+          main: "#01B4E2",
         },
         secondary: {
-          main: "#afac88",
+          main: "#01B4E2",
         },
       },
     },
     dark: {
       palette: {
         primary: {
-          main: "#afac88",
+          main: "#01B4E2",
         },
         secondary: {
-          main: "#afac88",
+          main: "#01B4E2",
         },
       },
     },

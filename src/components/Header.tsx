@@ -59,6 +59,7 @@ export default function Header({ loaded }: HeaderProps) {
               ? config.brand.logo.light ?? "/logo.svg"
               : config.brand.logo.dark ?? "/logo_dark.svg"
           }
+          width={"150px"}
           height={"50px"}
           alt={`${config.brand.name} Logo`}
         />
