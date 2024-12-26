@@ -8,19 +8,21 @@ const Footer = () => {
       direction="row"
       py={2}
       px={4}
-      height={75}
+      justifyContent="center"
       alignItems="center"
-      margin="auto"
+      sx={{
+        borderTop: mode === "light" ? "1px solid #e0e0e0" : "1px solid #333",
+        width: "100%",
+      }}
     >
-      <img src="/optimism.png" height="50px" alt="Zeeve Logo"></img>
-      <Stack direction="row" marginLeft={2} gap={3}>
-        <Typography
-          color={mode === "light" ? "black" : "white"}
-          letterSpacing={1}
-        >
-          Powered by Optimism
-        </Typography>
-      </Stack>
+      <img src="/optimism.png" height="50px" alt="Zeeve Logo" />
+      <Typography
+        color={mode === "light" ? "black" : "white"}
+        letterSpacing={1}
+        ml={2}
+      >
+        Powered by Zeeve
+      </Typography>
     </Stack>
   );
 };
